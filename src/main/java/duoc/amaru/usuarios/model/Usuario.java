@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -50,7 +52,7 @@ public class Usuario {
     @Size(max = 30)
     private String sApellido;
 
-    @Column(name = "correo_user")
+    @Column(name = "correo_user", unique = true)
     @NotBlank
     @Pattern(regexp = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+"
                     + "(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)"
@@ -72,6 +74,11 @@ public class Usuario {
     @Column(name = "estado_user")
     private String estado;
 
+    @Column(name = "nvl_permiso_user")
+    @Min(value = 1)
+    @Max(value = 4)
+    private int nvlPermiso;
+
     //Constructor
     public Usuario(String rut, String dv, String pNomb, String sNomb, String pApel, String sApel, String email, String password, String telefono) {
         this.rut = rut;
@@ -84,5 +91,6 @@ public class Usuario {
         this.password = password;
         this.telefono = telefono;
         this.estado = "activo";
+        this.nvlPermiso = 1;
     }
 }
