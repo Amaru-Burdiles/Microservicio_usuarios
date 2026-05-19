@@ -24,10 +24,11 @@ Donde los espacios entre comillas (`""`) se reemplazan con los respectivos valor
 
 Es importante destacar algunas reglas de validación ya implementadas:
 
-* rut  
+* rut
   * No puede estar vacío
   * Debe tener entre 11 y 9 caracteres
   * Puede o no llevar puntos
+
 
 * dv
   * No puede estar vacío
