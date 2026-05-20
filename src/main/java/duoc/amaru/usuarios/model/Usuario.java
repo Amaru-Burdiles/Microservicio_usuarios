@@ -79,18 +79,33 @@ public class Usuario {
     @Max(value = 4)
     private int nvlPermiso;
 
-    //Constructor
-    public Usuario(String rut, String dv, String pNomb, String sNomb, String pApel, String sApel, String email, String password, String telefono) {
+    // CONSTRUCTOR CON TODOS LOS CAMPOS
+    public Usuario(String rut, String dv, String pNomb, String sNomb, String pApel,
+                   String sApel, String correo, String password, String telefono, int nvlPermiso) {
         this.rut = rut;
         this.dv = dv;
         this.pNombre = pNomb;
         this.sNombre = sNomb;
         this.pApellido = pApel;
         this.sApellido = sApel;
-        this.correo = email;
+        this.correo = correo;
         this.password = password;
         this.telefono = telefono;
         this.estado = "activo";
-        this.nvlPermiso = 1;
+        this.nvlPermiso = nvlPermiso;
+    }
+
+    // CONSTRUCTOR SOLO CAMPOS OBLIGATORIOS
+    public Usuario(String rut, String dv, String pNomb, String pApel,
+                   String correo, String password, String telefono, int nvlPermiso) {
+        this.rut = rut;
+        this.dv = dv;
+        this.pNombre = pNomb;
+        this.pApellido = pApel;
+        this.correo = correo;
+        this.password = password;
+        this.telefono = telefono;
+        this.estado = "activo";
+        this.nvlPermiso = nvlPermiso;
     }
 }
