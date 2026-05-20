@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 public class Cliente extends Usuario {
 
     // TODO: Conectar las tablas tarjeta y direccion
-    private List<Tarjeta> tarjetas;
     private List<Direccion> derecciones;
 
     // REGISTRO DE CLIENTE (COMPLETO)
