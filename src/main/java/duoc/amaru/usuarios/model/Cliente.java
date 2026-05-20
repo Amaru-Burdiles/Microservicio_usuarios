@@ -3,7 +3,7 @@ package duoc.amaru.usuarios.model;
 import java.util.List;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Entity
-@Table(name = "cliente")
 public class Cliente extends Usuario {
 
-    // TODO: Conectar la tabla direccion
+    // TODO: Revisar la relacion entre cliente y direccion
+    @OneToMany(mappedBy = "id", targetEntity = Direccion.class)
     private List<Direccion> derecciones;
 
     // REGISTRO DE CLIENTE (COMPLETO)

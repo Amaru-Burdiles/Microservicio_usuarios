@@ -1,5 +1,7 @@
 package duoc.amaru.usuarios.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,9 +21,14 @@ public class UsuarioControlador {
     @Autowired
     private UsuarioServicio usuarioServicio;
 
+    // OBTENER USUARIOS (TESTING)
     @GetMapping
-    public String getPlaceholder() {
-        return "Pagina principal";
+    public ResponseEntity<?> getUsuarios() {
+        List<Usuario> users = usuarioServicio.getUsers();
+
+        if (users.isEmpty())
+            return ResponseEntity.ok("No hay usuarios registrados");
+        return ResponseEntity.ok(users);
     }
 
     // REGISTRAR USUARIO

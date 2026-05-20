@@ -1,5 +1,7 @@
 package duoc.amaru.usuarios.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,10 @@ public class UsuarioServicio {
 
         // Contraseña incorrecta
         return ResponseEntity.status(401).body("La contraseña es incorrecta");
+    }
+
+    public List<Usuario> getUsers() {
+        return usuarioRepo.findAll();
     }
 
     // CERRAR SESION
