@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "cliente")
 public class Cliente extends Usuario {
 
-    // TODO: Conectar las tablas tarjeta y direccion
+    // TODO: Conectar la tabla direccion
     private List<Direccion> derecciones;
 
     // REGISTRO DE CLIENTE (COMPLETO)
