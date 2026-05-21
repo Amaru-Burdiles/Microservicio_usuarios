@@ -1,4 +1,4 @@
-package duoc.amaru.usuarios.model;
+package duoc.amaru.usuarios.enums;
 
 public enum Comuna {
     CONCEPCION,

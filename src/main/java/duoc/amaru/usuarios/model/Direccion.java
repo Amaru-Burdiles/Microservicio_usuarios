@@ -1,5 +1,7 @@
 package duoc.amaru.usuarios.model;
 
+import duoc.amaru.usuarios.enums.Comuna;
+import duoc.amaru.usuarios.enums.Region;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
