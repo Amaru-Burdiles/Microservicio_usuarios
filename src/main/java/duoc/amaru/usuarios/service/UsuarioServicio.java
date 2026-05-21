@@ -22,7 +22,11 @@ public class UsuarioServicio {
                 return ResponseEntity.status(400).body("El correo ingresado ya está registrado");
         }
 
-        // Guardar nuevo usuario
+        // Config usuario nuevo
+        nuevoUsuario.setEstado("activo");
+        nuevoUsuario.setNvlPermiso(1);
+
+        // Guardar usuario nuevo
         usuarioRepo.save(nuevoUsuario);
         return ResponseEntity.ok("Usuario registrado exitosamente");
     }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import duoc.amaru.usuarios.DTO.LogInDTO;
 import duoc.amaru.usuarios.model.Usuario;
 import duoc.amaru.usuarios.service.UsuarioServicio;
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -33,14 +35,14 @@ public class UsuarioControlador {
 
     // REGISTRAR USUARIO
     @PostMapping("/signin")
-    public ResponseEntity<?> postRegistrarUsuario(@RequestBody Usuario nuevoUsuario) {
+    public ResponseEntity<?> postRegistrarUsuario(@Valid @RequestBody Usuario nuevoUsuario) {
         return usuarioServicio.registrarUsuario(nuevoUsuario);
     }
     
 
     // INICIAR SESION
     @PostMapping("/login")
-    public ResponseEntity<?> postInicioSesion(@RequestBody LogInDTO logInDTO) {
+    public ResponseEntity<?> postInicioSesion(@Valid @RequestBody LogInDTO logInDTO) {
         return usuarioServicio.iniciarSesion(logInDTO.getCorreo(), logInDTO.getPassword());
     }
 

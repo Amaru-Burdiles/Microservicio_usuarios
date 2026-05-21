@@ -18,14 +18,4 @@ public class Cliente extends Usuario {
     @OneToMany
     @JoinColumn(name = "cliente_id")
     private List<Direccion> derecciones;
-
-    // REGISTRO DE CLIENTE (COMPLETO)
-    public Cliente(String rut, String dv, String pNomb, String sNomb, String pApel, String sApel, String email, String password, String telefono) {
-        super(rut, dv, pNomb, sNomb, pApel, sApel, email, password, telefono, 1);
-    }
-
-    // REGISTRO DE CLIENTE (SOLO CAMPOS OBLIGATORIOS)
-    public Cliente(String rut, String dv, String pNomb, String pApel, String email, String password, String telefono) {
-        super(rut, dv, pNomb, pApel, email, password, telefono, 1);
-    }
 }
