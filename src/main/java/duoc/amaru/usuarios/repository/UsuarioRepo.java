@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import duoc.amaru.usuarios.model.Usuario;
 
 public interface UsuarioRepo extends JpaRepository<Usuario, Long> {
-    
+    boolean existsByCorreo(String correo);
 }

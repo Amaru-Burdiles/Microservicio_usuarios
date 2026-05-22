@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "empleado")
 public class Empleado extends Usuario {
     
     @Column(name = "cargo_emp")

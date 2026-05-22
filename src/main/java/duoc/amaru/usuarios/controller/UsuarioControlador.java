@@ -33,11 +33,12 @@ public class UsuarioControlador {
         return ResponseEntity.ok(users);
     }
 
+    // TODO: Ver donde colocar el metodo SignIn
     // REGISTRAR USUARIO
-    @PostMapping("/signin")
+    /* @PostMapping("/signin")
     public ResponseEntity<?> postRegistrarUsuario(@Valid @RequestBody Usuario nuevoUsuario) {
         return usuarioServicio.registrarUsuario(nuevoUsuario);
-    }
+    } */
     
 
     // INICIAR SESION

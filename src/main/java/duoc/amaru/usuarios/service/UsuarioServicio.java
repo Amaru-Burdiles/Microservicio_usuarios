@@ -14,23 +14,6 @@ public class UsuarioServicio {
     @Autowired
     private UsuarioRepo usuarioRepo;
 
-    // REGISTRAR USUARIO
-    public ResponseEntity<?> registrarUsuario(Usuario nuevoUsuario) {
-        // Verificar que el correo no esté registrado
-        for (Usuario user : usuarioRepo.findAll()) {
-            if (user.getCorreo().equalsIgnoreCase(nuevoUsuario.getCorreo()))
-                return ResponseEntity.status(400).body("El correo ingresado ya está registrado");
-        }
-
-        // Config usuario nuevo
-        nuevoUsuario.setEstado("activo");
-        nuevoUsuario.setNvlPermiso(1);
-
-        // Guardar usuario nuevo
-        usuarioRepo.save(nuevoUsuario);
-        return ResponseEntity.ok("Usuario registrado exitosamente");
-    }
-
     // INICIAR SESION
     public ResponseEntity<?> iniciarSesion(String correo, String password) {
         // Quien intenta iniciar sesión
