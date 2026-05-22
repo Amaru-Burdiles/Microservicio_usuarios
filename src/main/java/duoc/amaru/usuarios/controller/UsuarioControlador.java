@@ -25,18 +25,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("api/v1/eco_market_spa")
 public class UsuarioControlador {
-    private final EmpleadoServicio empleadoServicio;
-
     @Autowired
     private UsuarioServicio usuarioServicio;
 
     @Autowired
     private ClienteServicio clienteServicio;
 
-    UsuarioControlador(EmpleadoServicio empleadoServicio) {
-        this.empleadoServicio = empleadoServicio;
-    }
-
+    @Autowired
+    private EmpleadoServicio empleadoServicio;
+    
     // OBTENER USUARIOS (TESTING)
     @GetMapping
     public ResponseEntity<?> getUsuarios() {
