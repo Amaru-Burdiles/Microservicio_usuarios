@@ -6,4 +6,5 @@ import duoc.amaru.usuarios.model.Usuario;
 
 public interface UsuarioRepo extends JpaRepository<Usuario, Long> {
     boolean existsByCorreo(String correo);
+    Usuario findByCorreo(String correo);
 }

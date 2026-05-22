@@ -30,23 +30,28 @@ public class ClienteServicio {
 
         // Guardar usuario nuevo
         usuarioRepo.save(nuevoCliente);
-        return ResponseEntity.ok("Usuario registrado exitosamente");
+        return ResponseEntity.status(201).body("Usuario registrado exitosamente");
     }
 
     
     // AÑADIR DIRECCION DE ENVIO
     public ResponseEntity<?> addDireccion(Long id, Direccion dir) {
+        // Verifica que el cliente existe
         if (!usuarioRepo.existsById(id))
             return ResponseEntity.status(400).body("Cliente no encontrado");
 
+        // Obtiene el cliente al que pertenecera la direccion
         Cliente cli = clienteRepo.getReferenceById(id);
 
+        // Si la etiqueta de direccion esta vacía, genera una por defecto
         if (dir.getEtiqueta().isBlank()) {
             String tag = "Dirección #" + cli.getTagId().getAndIncrement();
             dir.setEtiqueta(tag);
         }
 
+        // Agrega la direccion y genera respuesta para controlador
         cli.getDirecciones().add(dir);
-        return ResponseEntity.ok("Dirección añadida correctamente a "+ cli.getPNombre() +" como '"+ dir.getEtiqueta() +'\'');
+        String reply = "Dirección añadida correctamente a "+ cli.getPNombre() +" como '"+ dir.getEtiqueta() +'\'';
+        return ResponseEntity.status(201).body(reply);
     }
 }

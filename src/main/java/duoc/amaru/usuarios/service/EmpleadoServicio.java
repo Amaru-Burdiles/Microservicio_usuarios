@@ -16,8 +16,30 @@ public class EmpleadoServicio {
     @Autowired
     private UsuarioRepo usuarioRepo;
 
+    @Autowired
+    private SesionServicio sesionServicio;
+
     // REGISTRO DE EMPLEADOS
-    public ResponseEntity<?> registrarUsuario(Empleado newEmpleado) {
+    public ResponseEntity<?> registrarUsuario(Long id, Empleado newEmpleado) {
+        // # VALIDACION DE PERMISOS
+        // Valida que el Id de usuario existe
+        if (!usuarioRepo.existsById(id))
+            return ResponseEntity.status(400).body("Usuario no registrado");
+
+        // Valida que se trata de un empleado
+        if (!empleadoRepo.existsById(id))
+            return ResponseEntity.status(403).body("Solo empleados pueden realizar esta acción");
+
+        // Valida que el empleado ha iniciado sesión
+        Empleado emp = empleadoRepo.getReferenceById(id);
+        if (!sesionServicio.isLoggedIn(id))
+            return ResponseEntity.status(401).body("Usuario no autenticado. Se requiere iniciar sesión");
+
+        // Valida que el empleado tiene permisos suficientes (3, 4)
+        if (emp.getNvlPermiso() < 3)
+            return ResponseEntity.status(403).body("Permisos insuficientes");
+
+        // # VALIDACION DE EMPLEADO NUEVO
         // Verificar que el correo no esté registrado
         if (usuarioRepo.existsByCorreo(newEmpleado.getCorreo()))
             return ResponseEntity.status(400).body("El correo ingresado ya está registrado");
@@ -26,9 +48,9 @@ public class EmpleadoServicio {
         newEmpleado.setEstado("activo");
         evaluarCargo(newEmpleado.getCargo(), newEmpleado);
 
-        // Guardar usuario nuevo
+        // Guardar usuario nuevo y respuesta al controlador
         usuarioRepo.save(newEmpleado);
-        return ResponseEntity.ok("Usuario registrado exitosamente");
+        return ResponseEntity.status(201).body("Usuario registrado exitosamente");
     }
 
     

@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,6 @@ public class Cliente extends Usuario {
     @JoinColumn(name = "cliente_id")
     private List<Direccion> direcciones;
 
+    @Transient
     private final AtomicInteger tagId = new AtomicInteger(1);
 }
