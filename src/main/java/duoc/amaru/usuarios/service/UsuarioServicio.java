@@ -30,6 +30,10 @@ public class UsuarioServicio {
         // Contraseña incorrecta
         if (!logging.getPassword().equals(password))
             return ResponseEntity.status(401).body("La contraseña es incorrecta");
+
+        // Validación usuario desactivado
+        if (logging.getEstado().equals("Desactivado"))
+            return ResponseEntity.status(403).body("Esta cuenta se encuentra desactivada");
         
         // Id del Usuario
         Long id = logging.getId();

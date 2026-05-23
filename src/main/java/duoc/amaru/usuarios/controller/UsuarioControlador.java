@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import duoc.amaru.usuarios.service.UsuarioServicio;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -69,5 +71,27 @@ public class UsuarioControlador {
         return usuarioServicio.cerrarSesion(id);
     }
     
-    
+    // ACTUALIZAR PERMISOS DE USUARIO
+    @PutMapping("/user{userId}:config/access{nvl}/{executorId}")
+    public ResponseEntity<?> putConfigUsuario(@PathVariable Long userId, @PathVariable int nvl, @PathVariable Long executor) {
+        return empleadoServicio.updateUsusario(userId, nvl, executor);
+    }
+
+    // ACTUALIZAR CARGO DE EMPLEADO
+    @PutMapping("/user{userId}:config/cargo:{}/{executorId}")
+    public ResponseEntity<?> putCargoEmpleado(@PathVariable Long empId, @PathVariable String cargo, @PathVariable Long executor) {
+        return empleadoServicio.updateUsuario(empId, cargo, executor);
+    }
+
+    // DESACTIVAR USUARIO
+    @PutMapping("/user{userId}:desactivar/{executorId}")
+    public ResponseEntity<?> putDesactivarUser(@PathVariable Long userId, @PathVariable Long executorId) {
+        return empleadoServicio.desactivarUser(userId, executorId);
+    }
+
+    // ELIMINAR USUARIOS
+    @DeleteMapping("/user{userId}:eliminar/{executorId}")
+    public ResponseEntity<?> deleteUsuario(@PathVariable Long userId, @PathVariable Long executorId) {
+        return empleadoServicio.eliminarUser(userId, executorId);
+    }
 }
