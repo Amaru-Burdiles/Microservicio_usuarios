@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import duoc.amaru.usuarios.DTO.LogInDTO;
+import duoc.amaru.usuarios.dto.LogInDTO;
 import duoc.amaru.usuarios.model.Cliente;
 import duoc.amaru.usuarios.model.Empleado;
 import duoc.amaru.usuarios.model.Usuario;

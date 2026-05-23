@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -56,11 +57,7 @@ public abstract class Usuario {
 
     @Column(name = "correo_user", unique = true)
     @NotBlank(message = "El correo es obligatorio")
-    @Pattern(regexp = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+"
-                    + "(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)"
-                    + "*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+"
-                    + "[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-             message = "Correo inválido")
+    @Email(message = "Correo inválido")
     private String correo;
 
     @Column(name = "password_user")

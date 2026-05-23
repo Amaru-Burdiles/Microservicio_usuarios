@@ -1,5 +1,6 @@
-package duoc.amaru.usuarios.DTO;
+package duoc.amaru.usuarios.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class LogInDTO {
     @NotBlank(message = "Falta el correo")
+    @Email(message = "Correo inválido")
     private String correo;
 
     @NotBlank(message = "Falta la contraseña")
