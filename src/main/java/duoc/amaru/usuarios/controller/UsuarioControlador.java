@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("api/v1/eco_market_spa")
+@RequestMapping("api/v1/usuarios")
 public class UsuarioControlador {
     @Autowired
     private UsuarioServicio usuarioServicio;
@@ -78,7 +78,7 @@ public class UsuarioControlador {
     }
 
     // ACTUALIZAR CARGO DE EMPLEADO
-    @PutMapping("/user{userId}:config/cargo:{}/{executorId}")
+    @PutMapping("/user{userId}:config/cargo:{cargo}/{executorId}")
     public ResponseEntity<?> putCargoEmpleado(@PathVariable Long empId, @PathVariable String cargo, @PathVariable Long executor) {
         return empleadoServicio.updateUsuario(empId, cargo, executor);
     }
