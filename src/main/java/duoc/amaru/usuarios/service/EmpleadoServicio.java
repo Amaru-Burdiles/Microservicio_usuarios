@@ -34,7 +34,7 @@ public class EmpleadoServicio {
     // REGISTRO DE EMPLEADOS
     public ResponseEntity<?> registrarUsuario(Long id, Empleado newEmpleado) {
         // # VALIDACION DE PERMISOS
-        ResponseEntity<?> reply = accessValidation(id, 3);
+        ResponseEntity<?> reply = sesionServicio.accessValidation(id, 3);
         if (reply != null)
             return reply;
 
@@ -55,7 +55,7 @@ public class EmpleadoServicio {
     // ACTUALIZAR PERMISOS DE USUARIO
     public ResponseEntity<?> updateUsusario(Long userId, int nvl, Long executor) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = accessValidation(executor, 4);
+        ResponseEntity<?> reply = sesionServicio.accessValidation(executor, 4);
         if (reply != null)
             return reply;
 
@@ -76,7 +76,7 @@ public class EmpleadoServicio {
     // ACTUALIZAR CARGO EMPLEADO
     public ResponseEntity<?> updateUsuario(Long empId, String cargo, Long executor) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = accessValidation(executor, 4);
+        ResponseEntity<?> reply = sesionServicio.accessValidation(executor, 4);
         if (reply != null)
             return reply;
 
@@ -97,7 +97,7 @@ public class EmpleadoServicio {
     // DESACTIVAR USUARIOS
     public ResponseEntity<?> desactivarUser(Long userId, Long executorId) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = accessValidation(executorId, 4);
+        ResponseEntity<?> reply = sesionServicio.accessValidation(executorId, 4);
         if (reply != null)
             return reply;
 
@@ -115,7 +115,7 @@ public class EmpleadoServicio {
     // ELIMINAR USUARIOS
     public ResponseEntity<?> eliminarUser(Long userId, Long executorId) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = accessValidation(executorId, 4);
+        ResponseEntity<?> reply = sesionServicio.accessValidation(executorId, 4);
         if (reply != null)
             return reply;
 
@@ -145,30 +145,6 @@ public class EmpleadoServicio {
         emp.setCargo("Encargado de Ventas");
         emp.setNvlPermiso(2);
     }
-
-    // VALIDAR NIVEL DE ACCESO
-    private ResponseEntity<?> accessValidation(Long executorId, int lvlFilter) {
-        // Valida que el Id de usuario existe
-        if (!usuarioRepo.existsById(executorId))
-            return ResponseEntity.status(400).body("Usuario no registrado");
-
-        // Valida que se trata de un empleado
-        if (!empleadoRepo.existsById(executorId))
-            return ResponseEntity.status(403).body("Solo empleados pueden realizar esta acción");
-
-        // Valida que el empleado ha iniciado sesión
-        Empleado emp = empleadoRepo.getReferenceById(executorId);
-
-        if (!sesionServicio.isLoggedIn(executorId))
-            return ResponseEntity.status(401).body("Usuario no autenticado. Se requiere iniciar sesión");
-
-        // Valida que el empleado tiene permisos suficientes
-        if (emp.getNvlPermiso() < lvlFilter)
-            return ResponseEntity.status(403).body("Permisos insuficientes");
-
-        return null;
-    }
-
 
 
 }
