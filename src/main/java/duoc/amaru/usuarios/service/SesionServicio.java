@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import duoc.amaru.usuarios.model.Empleado;
+import duoc.amaru.usuarios.repository.ClienteRepo;
 import duoc.amaru.usuarios.repository.EmpleadoRepo;
 import duoc.amaru.usuarios.repository.UsuarioRepo;
 
@@ -18,6 +19,9 @@ public class SesionServicio {
 
     @Autowired
     private EmpleadoRepo empleadoRepo;
+
+    @Autowired
+    private ClienteRepo clienteRepo;
 
     // Id de usuarios logeados
     private Set<Long> sesiones = new HashSet<>();
@@ -34,7 +38,7 @@ public class SesionServicio {
         return sesiones.remove(id);
     }
 
-    // VALIDAR NIVEL DE ACCESO
+    // VALIDAR NIVEL DE ACCESO EMPLEADOS
     public ResponseEntity<?> accessValidation(Long executorId, int lvlFilter) {
         // Valida que el Id de usuario existe
         if (!usuarioRepo.existsById(executorId))
@@ -45,15 +49,31 @@ public class SesionServicio {
             return ResponseEntity.status(403).body("Solo empleados pueden realizar esta acción");
 
         // Valida que el empleado ha iniciado sesión
-        Empleado emp = empleadoRepo.getReferenceById(executorId);
-
         if (!isLoggedIn(executorId))
             return ResponseEntity.status(401).body("Usuario no autenticado. Se requiere iniciar sesión");
 
         // Valida que el empleado tiene permisos suficientes
+        Empleado emp = empleadoRepo.getReferenceById(executorId);
         if (emp.getNvlPermiso() < lvlFilter)
             return ResponseEntity.status(403).body("Permisos insuficientes");
 
+        return null;
+    }
+
+    // VALIDAR CLIENTES
+    public ResponseEntity<?> validacionCliente(Long executorId) {
+        // Valida que el Id de usuario existe
+        if (!usuarioRepo.existsById(executorId))
+            return ResponseEntity.status(400).body("Usuario no registrado");
+
+        // Valida que se trata de un cliente
+        if (!clienteRepo.existsById(executorId))
+            return ResponseEntity.status(403).body("Solo clientes pueden realizar esta acción");
+
+        // Valida que el cliente ha iniciado sesión
+        if (!isLoggedIn(executorId))
+            return ResponseEntity.status(401).body("Usuario no autenticado. Se requiere iniciar sesión");
+        
         return null;
     }
 }
