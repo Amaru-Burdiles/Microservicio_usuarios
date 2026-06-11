@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import duoc.amaru.usuarios.dto.LogInDTO;
+import duoc.amaru.usuarios.dto.UpdateDirDTO;
 import duoc.amaru.usuarios.model.Cliente;
+import duoc.amaru.usuarios.model.Direccion;
 import duoc.amaru.usuarios.model.Empleado;
 import duoc.amaru.usuarios.model.Usuario;
 import duoc.amaru.usuarios.service.ClienteServicio;
@@ -81,6 +83,36 @@ public class UsuarioControlador {
     @PutMapping("/user{userId}:config/cargo:{cargo}/{executorId}")
     public ResponseEntity<?> putCargoEmpleado(@PathVariable Long empId, @PathVariable String cargo, @PathVariable Long executor) {
         return empleadoServicio.updateUsuario(empId, cargo, executor);
+    }
+
+    // AGREGAR DIRECCION DE ENVIO A CLIENTE
+    @PostMapping("/user{userId}/direccion/add")
+    public ResponseEntity<?> postDireccionEnvio(@Valid @RequestBody Direccion direccion, @PathVariable Long userId) {
+        return clienteServicio.addDireccion(userId, direccion);        
+    }
+
+    // OBTENER DIRECCIONES DE ENVIO DE CLIENTE
+    @GetMapping("/user{userId}/direcciones")
+    public ResponseEntity<?> getDireccionesEnvio(@PathVariable Long userId) {
+        return clienteServicio.getDirecciones(userId);
+    }
+
+    // OBTENER DETALLE DE DIRECCION DE ENVIO DE CLIENTE
+    @GetMapping("/user{userId}/direccion/{dirId}")
+    public ResponseEntity<?> getDireccionEnvio(@PathVariable Long userId, @PathVariable Long dirId) {
+        return clienteServicio.getDireccion(userId, dirId);
+    }
+
+    // ACTUALIZAR DIRECCION DE ENVIO DE CLIENTE
+    @PutMapping("/user{userId}/direccion{dirId}/update")
+    public ResponseEntity<?> putDireccionEnvio(@Valid @RequestBody UpdateDirDTO direccion, @PathVariable Long userId, @PathVariable Long dirId) {
+        return clienteServicio.updateDireccion(userId, direccion, dirId);
+    }
+
+    // QUITAR DIRECCION DE ENVIO DE CLIENTE
+    @DeleteMapping("/user{userId}/direccion{dirId}/del")
+    public ResponseEntity<?> deleteDireccionEnvio(@PathVariable Long userId, @PathVariable Long dirId) {
+        return clienteServicio.deleteDireccion(userId, dirId);
     }
 
     // DESACTIVAR USUARIO
