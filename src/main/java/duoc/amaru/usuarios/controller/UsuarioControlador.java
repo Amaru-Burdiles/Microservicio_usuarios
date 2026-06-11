@@ -89,7 +89,7 @@ public class UsuarioControlador {
         return empleadoServicio.desactivarUser(userId, executorId);
     }
 
-    // ELIMINAR USUARIOS
+    // ELIMINAR USUARIO
     @DeleteMapping("/user{userId}:eliminar/{executorId}")
     public ResponseEntity<?> deleteUsuario(@PathVariable Long userId, @PathVariable Long executorId) {
         return empleadoServicio.eliminarUser(userId, executorId);
