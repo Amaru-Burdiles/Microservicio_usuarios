@@ -44,8 +44,10 @@ public class ClienteServicio {
     // AÑADIR DIRECCION DE ENVIO
     public ResponseEntity<?> addDireccion(Long id, Direccion dir) {
         // Verifica que el cliente existe
-        if (!usuarioRepo.existsById(id))
-            return ResponseEntity.status(400).body("Cliente no encontrado");
+        ResponseEntity<?> reply = sesionServicio.validacionCliente(id);
+        if (reply != null) {
+            return reply;
+        }
 
         // Obtiene el cliente al que pertenecera la direccion
         Cliente cli = clienteRepo.getReferenceById(id);
@@ -58,8 +60,8 @@ public class ClienteServicio {
 
         // Agrega la direccion y genera respuesta para controlador
         cli.getDirecciones().add(dir);
-        String reply = "Dirección añadida correctamente a "+ cli.getPNombre() +" como '"+ dir.getEtiqueta() +'\'';
-        return ResponseEntity.status(201).body(reply);
+        String respuesta = "Dirección añadida correctamente a "+ cli.getPNombre() +" como '"+ dir.getEtiqueta() +'\'';
+        return ResponseEntity.status(201).body(respuesta);
     }
 
     // OBTENER DIRECCIONES DE ENVIO DE UN CLIENTE

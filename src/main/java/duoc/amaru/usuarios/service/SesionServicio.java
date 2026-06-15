@@ -26,16 +26,32 @@ public class SesionServicio {
     // Id de usuarios logeados
     private Set<Long> sesiones = new HashSet<>();
 
+    // VALIDAR SESION
     public boolean isLoggedIn(Long id) {
         return sesiones.contains(id);
     }
 
+    // INICIAR SESION
     public boolean logIn(Long id) {
         return sesiones.add(id);
     }
 
+    // CERRAR SESION
     public boolean logOut(Long id) {
         return sesiones.remove(id);
+    }
+
+    // VALIDAR USUARIOS
+    public ResponseEntity<?> validacionUsuario(Long executorId) {
+        // Valida que el Id de usuario existe
+        if (!usuarioRepo.existsById(executorId))
+            return ResponseEntity.status(400).body("Usuario no registrado");
+
+        // Valida que el usuario ha iniciado sesión
+        if (!isLoggedIn(executorId))
+            return ResponseEntity.status(401).body("Usuario no autenticado. Se requiere iniciar sesión");
+        
+        return null;
     }
 
     // VALIDAR NIVEL DE ACCESO EMPLEADOS
