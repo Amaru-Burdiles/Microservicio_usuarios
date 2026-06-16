@@ -17,22 +17,26 @@ public class SesionControlador {
     private SesionServicio sesionServicio;
 
     // VALIDAR EMPLEADOS Y SU NIVEL DE ACCESO
-    @GetMapping("/access-validation/exe:{executorId}/filter:{lvl}")
-    public ResponseEntity<?> getAccess(@PathVariable Long ejecutor, @PathVariable int lvl) {
-        return sesionServicio.accessValidation(ejecutor, lvl);
+    @GetMapping("/validacion-empleado/exe:{executorId}/filter:{lvl}")
+    public ResponseEntity<?> validarEmpleado(@PathVariable Long ejecutor, @PathVariable int lvl) {
+        return sesionServicio.validacionEmpleado(ejecutor, lvl);
     }
 
-    // VALIDAR QUE EL USUARIO HAYA INICIADO SESION
+    // VALIDAR CLIENTES
+    @GetMapping("/validacion-cliente/exe:{userId}")
+    public ResponseEntity<?> validarCliente(@PathVariable Long userId) {
+        return sesionServicio.validacionCliente(userId);
+    }
+    
+    // VALIDAR USUARIOS EN GENERAL
+    @GetMapping("/validacion-usuario/exe:{userId}")
+    public ResponseEntity<?> validarUsuario(@PathVariable Long userId) {
+        return sesionServicio.validacionUsuario(userId);
+    }
+    
+    // VALIDAR USUARIO HAYA INICIADO SESION
     @GetMapping("/is-logged-in/user:{userId}")
     public boolean getIsLoggedIn(@PathVariable Long userId) {
         return sesionServicio.isLoggedIn(userId);
     }
-
-    // VALIDAR CLIENTES
-    @GetMapping("/validacion-cliente/user:{userId}")
-    public ResponseEntity<?> getAccess(@PathVariable Long userId) {
-        return sesionServicio.validacionCliente(userId);
-    }
-    
-    
 }

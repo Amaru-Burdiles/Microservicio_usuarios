@@ -34,7 +34,7 @@ public class EmpleadoServicio {
     // REGISTRO DE EMPLEADOS
     public ResponseEntity<?> registrarUsuario(Long id, Empleado newEmpleado) {
         // # VALIDACION DE PERMISOS
-        ResponseEntity<?> reply = sesionServicio.accessValidation(id, 3);
+        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(id, 3);
         if (reply != null)
             return reply;
 
@@ -55,7 +55,7 @@ public class EmpleadoServicio {
     // ACTUALIZAR PERMISOS DE USUARIO
     public ResponseEntity<?> updateUsusario(Long userId, int nvl, Long executor) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = sesionServicio.accessValidation(executor, 4);
+        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(executor, 4);
         if (reply != null)
             return reply;
 
@@ -76,7 +76,7 @@ public class EmpleadoServicio {
     // ACTUALIZAR CARGO EMPLEADO
     public ResponseEntity<?> updateUsuario(Long empId, String cargo, Long executor) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = sesionServicio.accessValidation(executor, 4);
+        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(executor, 4);
         if (reply != null)
             return reply;
 
@@ -97,7 +97,7 @@ public class EmpleadoServicio {
     // DESACTIVAR USUARIOS
     public ResponseEntity<?> desactivarUser(Long userId, Long executorId) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = sesionServicio.accessValidation(executorId, 4);
+        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(executorId, 4);
         if (reply != null)
             return reply;
 
@@ -115,7 +115,7 @@ public class EmpleadoServicio {
     // ELIMINAR USUARIOS
     public ResponseEntity<?> eliminarUser(Long userId, Long executorId) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = sesionServicio.accessValidation(executorId, 4);
+        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(executorId, 4);
         if (reply != null)
             return reply;
 

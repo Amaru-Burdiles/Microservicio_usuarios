@@ -55,7 +55,7 @@ public class SesionServicio {
     }
 
     // VALIDAR NIVEL DE ACCESO EMPLEADOS
-    public ResponseEntity<?> accessValidation(Long executorId, int lvlFilter) {
+    public ResponseEntity<?> validacionEmpleado(Long executorId, int lvlFilter) {
         // Valida que el Id de usuario existe
         if (!usuarioRepo.existsById(executorId))
             return ResponseEntity.status(400).body("Usuario no registrado");
