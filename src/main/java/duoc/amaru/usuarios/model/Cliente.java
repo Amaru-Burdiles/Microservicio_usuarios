@@ -8,7 +8,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,6 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "cliente")
 public class Cliente extends Usuario {
@@ -27,4 +25,9 @@ public class Cliente extends Usuario {
 
     @Transient
     private final AtomicInteger tagId = new AtomicInteger(1);
+
+    public Cliente(Long id, String rut, String pNomb, String sNomb, String pApel, String sApel, String mail, String password, String telefono, String estado, int nvlPermiso, List<Direccion> direcciones) {
+        super(id, rut, pNomb, sNomb, pApel, sApel, mail, password, telefono, estado, nvlPermiso);
+        this.direcciones = direcciones;
+    }
 }

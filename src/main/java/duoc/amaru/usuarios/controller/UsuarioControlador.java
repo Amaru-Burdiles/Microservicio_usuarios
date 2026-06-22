@@ -51,7 +51,11 @@ public class UsuarioControlador {
     // REGISTRAR CLIENTE
     @PostMapping("/signin")
     public ResponseEntity<?> postRegistrarCliente(@Valid @RequestBody Cliente newCliente) {
-        return clienteServicio.registrarUsuario(newCliente);
+        Cliente serviceReply = clienteServicio.registrarUsuario(newCliente);
+        if (serviceReply == null)
+            return ResponseEntity.status(400).body("El correo ingresado ya está registrado");
+        
+        return ResponseEntity.status(201).body("Usuario registrado exitosamente");
     }
 
     // REGISTRAR EMPLEADO

@@ -26,18 +26,17 @@ public class ClienteServicio {
     private SesionServicio sesionServicio;
 
     // REGISTRO DE CLIENTES
-    public ResponseEntity<?> registrarUsuario(Cliente nuevoCliente) {
+    public Cliente registrarUsuario(Cliente nuevoCliente) {
         // Verificar que el correo no esté registrado
         if (usuarioRepo.existsByCorreo(nuevoCliente.getCorreo()))
-            return ResponseEntity.status(400).body("El correo ingresado ya está registrado");
+            return null;
 
         // Config usuario nuevo
         nuevoCliente.setEstado("activo");
         nuevoCliente.setNvlPermiso(1);
 
         // Guardar usuario nuevo
-        usuarioRepo.save(nuevoCliente);
-        return ResponseEntity.status(201).body("Usuario registrado exitosamente");
+        return usuarioRepo.save(nuevoCliente);
     }
 
     
