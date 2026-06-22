@@ -34,9 +34,7 @@ public class EmpleadoServicio {
     // REGISTRO DE EMPLEADOS
     public ResponseEntity<?> registrarUsuario(Long id, Empleado newEmpleado) {
         // # VALIDACION DE PERMISOS
-        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(id, 3);
-        if (reply != null)
-            return reply;
+        sesionServicio.validacionEmpleado(id, 3);
 
         // # VALIDACION DE EMPLEADO NUEVO
         // Verificar que el correo no esté registrado
@@ -55,9 +53,7 @@ public class EmpleadoServicio {
     // ACTUALIZAR PERMISOS DE USUARIO
     public ResponseEntity<?> updateUsusario(Long userId, int nvl, Long executor) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(executor, 4);
-        if (reply != null)
-            return reply;
+        sesionServicio.validacionEmpleado(executor, 4);
 
         // Validar que el usuario a actualizar existe
         Optional<Usuario> updating = usuarioRepo.findById(userId);
@@ -76,9 +72,7 @@ public class EmpleadoServicio {
     // ACTUALIZAR CARGO EMPLEADO
     public ResponseEntity<?> updateUsuario(Long empId, String cargo, Long executor) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(executor, 4);
-        if (reply != null)
-            return reply;
+        sesionServicio.validacionEmpleado(executor, 4);
 
         // Validar que empleado a actualizar existe
         Optional<Empleado> updating = empleadoRepo.findById(empId);
@@ -97,9 +91,7 @@ public class EmpleadoServicio {
     // DESACTIVAR USUARIOS
     public ResponseEntity<?> desactivarUser(Long userId, Long executorId) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(executorId, 4);
-        if (reply != null)
-            return reply;
+        sesionServicio.validacionEmpleado(executorId, 4);
 
         // Validar que usuario a desactivar existe
         Optional<Usuario> disabling = usuarioRepo.findById(userId);
@@ -115,9 +107,7 @@ public class EmpleadoServicio {
     // ELIMINAR USUARIOS
     public ResponseEntity<?> eliminarUser(Long userId, Long executorId) {
         // Validar permisos del ejecutor
-        ResponseEntity<?> reply = sesionServicio.validacionEmpleado(executorId, 4);
-        if (reply != null)
-            return reply;
+        sesionServicio.validacionEmpleado(executorId, 4);
 
         // Validar que usuario a desactivar existe
         Optional<Usuario> deleting = usuarioRepo.findById(userId);

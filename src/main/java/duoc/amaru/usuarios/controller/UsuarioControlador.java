@@ -92,7 +92,8 @@ public class UsuarioControlador {
     // AGREGAR DIRECCION DE ENVIO A CLIENTE
     @PostMapping("/user{userId}/direccion/add")
     public ResponseEntity<?> postDireccionEnvio(@Valid @RequestBody Direccion direccion, @PathVariable Long userId) {
-        return clienteServicio.addDireccion(userId, direccion);        
+        String respuesta = clienteServicio.addDireccion(userId, direccion);
+        return ResponseEntity.status(201).body(respuesta);
     }
 
     // OBTENER DIRECCIONES DE ENVIO DE CLIENTE

@@ -41,12 +41,9 @@ public class ClienteServicio {
 
     
     // AÑADIR DIRECCION DE ENVIO
-    public ResponseEntity<?> addDireccion(Long id, Direccion dir) {
+    public String addDireccion(Long id, Direccion dir) {
         // Verifica que el cliente existe
-        ResponseEntity<?> reply = sesionServicio.validacionCliente(id);
-        if (reply != null) {
-            return reply;
-        }
+        sesionServicio.validacionCliente(id);
 
         // Obtiene el cliente al que pertenecera la direccion
         Cliente cli = clienteRepo.getReferenceById(id);
@@ -59,17 +56,15 @@ public class ClienteServicio {
 
         // Agrega la direccion y genera respuesta para controlador
         cli.getDirecciones().add(dir);
-        String respuesta = "Dirección añadida correctamente a "+ cli.getPNombre() +" como '"+ dir.getEtiqueta() +'\'';
-        return ResponseEntity.status(201).body(respuesta);
+        usuarioRepo.save(cli);
+        return "Dirección añadida correctamente a "+ cli.getPNombre() +" como '"+ dir.getEtiqueta() +'\'';
     }
 
     // OBTENER DIRECCIONES DE ENVIO DE UN CLIENTE
     public ResponseEntity<?> getDirecciones(Long userId) {
         // Verifica que el cliente existe
-        ResponseEntity<?> reply = sesionServicio.validacionCliente(userId);
-        if (reply != null) {
-            return reply;
-        }
+        sesionServicio.validacionCliente(userId);
+
         // Obtiene al cliente
         Cliente cli = clienteRepo.getReferenceById(userId);
         
@@ -85,10 +80,7 @@ public class ClienteServicio {
     // OBTENER DIRECCION DE ENVIO DE UN CLIENTE
     public ResponseEntity<?> getDireccion(Long userId, Long dirId) {
         // Verifica que el cliente existe
-        ResponseEntity<?> reply = sesionServicio.validacionCliente(userId);
-        if (reply != null) {
-            return reply;
-        }
+        sesionServicio.validacionCliente(userId);
 
         // Buscar direccion por id
         Direccion dir = clienteRepo.findDireccionById(dirId);
@@ -101,10 +93,7 @@ public class ClienteServicio {
     // ACTUALIZAR DIRECCION DE ENVIO DE UN CLIENTE
     public ResponseEntity<?> updateDireccion(Long userId, UpdateDirDTO direccion, Long dirId) {
         // Verifica que el cliente existe
-        ResponseEntity<?> reply = sesionServicio.validacionCliente(userId);
-        if (reply != null) {
-            return reply;
-        }
+        sesionServicio.validacionCliente(userId);
 
         // Buscar direccion por id
         Direccion dir = clienteRepo.findDireccionById(dirId);
@@ -155,10 +144,7 @@ public class ClienteServicio {
     // QUITAR DIRECCION DE ENVIO DE UN CLIENTE
     public ResponseEntity<?> deleteDireccion(Long userId, Long dirId) {
         // Verifica que el cliente existe
-        ResponseEntity<?> reply = sesionServicio.validacionCliente(userId);
-        if (reply != null) {
-            return reply;
-        }
+        sesionServicio.validacionCliente(userId);
 
         // Buscar direccion por id
         Direccion dir = clienteRepo.findDireccionById(dirId);

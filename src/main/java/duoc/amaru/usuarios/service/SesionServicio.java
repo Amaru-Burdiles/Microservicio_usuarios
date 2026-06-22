@@ -4,9 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import duoc.amaru.usuarios.error.exceptions.ClientesOnlyException;
+import duoc.amaru.usuarios.error.exceptions.EmployeesOnlyException;
+import duoc.amaru.usuarios.error.exceptions.NotLoggedInException;
+import duoc.amaru.usuarios.error.exceptions.NotSignedInException;
+import duoc.amaru.usuarios.error.exceptions.SinPermisosException;
 import duoc.amaru.usuarios.model.Empleado;
 import duoc.amaru.usuarios.repository.ClienteRepo;
 import duoc.amaru.usuarios.repository.EmpleadoRepo;
@@ -42,54 +46,56 @@ public class SesionServicio {
     }
 
     // VALIDAR USUARIOS
-    public ResponseEntity<?> validacionUsuario(Long executorId) {
+    public boolean validacionUsuario(Long executorId) {
         // Valida que el Id de usuario existe
         if (!usuarioRepo.existsById(executorId))
-            return ResponseEntity.status(400).body("Usuario no registrado");
+            throw new NotSignedInException();
 
         // Valida que el usuario ha iniciado sesión
         if (!isLoggedIn(executorId))
-            return ResponseEntity.status(401).body("Usuario no autenticado. Se requiere iniciar sesión");
-        
-        return null;
+            throw new NotLoggedInException();        
+
+        return true;
     }
 
     // VALIDAR NIVEL DE ACCESO EMPLEADOS
-    public ResponseEntity<?> validacionEmpleado(Long executorId, int lvlFilter) {
+    public boolean validacionEmpleado(Long executorId, int lvlFilter) {
         // Valida que el Id de usuario existe
         if (!usuarioRepo.existsById(executorId))
-            return ResponseEntity.status(400).body("Usuario no registrado");
+            throw new NotSignedInException();
 
         // Valida que se trata de un empleado
         if (!empleadoRepo.existsById(executorId))
-            return ResponseEntity.status(403).body("Solo empleados pueden realizar esta acción");
+            throw new EmployeesOnlyException();
 
         // Valida que el empleado ha iniciado sesión
         if (!isLoggedIn(executorId))
-            return ResponseEntity.status(401).body("Usuario no autenticado. Se requiere iniciar sesión");
+            throw new NotLoggedInException();
 
         // Valida que el empleado tiene permisos suficientes
         Empleado emp = empleadoRepo.getReferenceById(executorId);
         if (emp.getNvlPermiso() < lvlFilter)
-            return ResponseEntity.status(403).body("Permisos insuficientes");
+            throw new SinPermisosException();
 
-        return null;
+        return true;
     }
 
     // VALIDAR CLIENTES
-    public ResponseEntity<?> validacionCliente(Long executorId) {
+    public boolean validacionCliente(Long executorId) {
         // Valida que el Id de usuario existe
         if (!usuarioRepo.existsById(executorId))
-            return ResponseEntity.status(400).body("Usuario no registrado");
+            throw new NotSignedInException();
 
         // Valida que se trata de un cliente
         if (!clienteRepo.existsById(executorId))
-            return ResponseEntity.status(403).body("Solo clientes pueden realizar esta acción");
+            throw new ClientesOnlyException();
 
         // Valida que el cliente ha iniciado sesión
         if (!isLoggedIn(executorId))
-            return ResponseEntity.status(401).body("Usuario no autenticado. Se requiere iniciar sesión");
-        
-        return null;
+            throw new NotLoggedInException();
+
+        return true;
     }
 }
+
+// Validar si el usuario esta desactivado
