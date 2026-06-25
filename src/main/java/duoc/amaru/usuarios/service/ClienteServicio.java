@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import duoc.amaru.usuarios.dto.GetClienteDTO;
+import duoc.amaru.usuarios.dto.GetClientesDTO;
 import duoc.amaru.usuarios.dto.GetDireccionDTO;
 import duoc.amaru.usuarios.dto.UpdateDirDTO;
 import duoc.amaru.usuarios.model.Cliente;
@@ -39,9 +41,75 @@ public class ClienteServicio {
         return usuarioRepo.save(nuevoCliente);
     }
 
+    // OBTENER CLIENTES REGISTRADOS
+    public List<GetClientesDTO> getAllClientes(Long idEjecutor) {
+        // Id = 0 representa operaciones y peticiones del sistema mismo
+        if (idEjecutor > 0) 
+            sesionServicio.validacionEmpleado(idEjecutor, 2);
+
+        // Summarize list
+        List<GetClientesDTO> summCli = new ArrayList<>();
+        
+        // Full list
+        List<Cliente> fullCli = clienteRepo.findAll();
+        for (Cliente cli : fullCli) {
+            String nombApel = cli.getPNombre() +' '+ cli.getPApellido();
+            summCli.add(new GetClientesDTO(cli.getId(), nombApel, cli.getCorreo(), cli.getEstado(), cli.getNvlPermiso()));
+        }
+
+        return summCli;
+    }
+
+    // OBTENER CLIENTE POR ID
+    public GetClienteDTO getClienteById(Long idEjecutor, Long idBuscar) {
+        if (idEjecutor > 0) {
+            sesionServicio.validacionUsuario(idEjecutor);
+            return null;
+        }
+
+        // Obtiene al cliente completo
+        Cliente full = clienteRepo.getReferenceById(idBuscar);
+        // Crea un cliente resumen (dto)
+        GetClienteDTO dto = new GetClienteDTO();
+
+        /* Rellena dto con info general
+           Ambos cliente dueño y admin puede ver esta info */
+        dto.setIdCliente(full.getId());
+        dto.setCorreo(full.getCorreo());
+        dto.setTelefono(full.getTelefono());
+        
+        // Validar idEjecutor es dueño de la info
+        if (idBuscar == idEjecutor) {
+            /* Rellena con info sensible
+            solo visible para cliente dueño */
+            dto.setRut(full.getRut());
+            dto.setDirecciones(full.getDirecciones());
+            dto.setPassword(full.getPassword());
+            
+            // Concatena los nombres
+            String fullName = full.getPNombre() + (full.getSNombre().isEmpty() ? ' ' : ' '+full.getSNombre() +' ');
+            // A eso le concatena los apellidos
+            fullName += full.getPApellido() + (!full.getSApellido().isEmpty() ? ' '+full.getSApellido() : "");
+            dto.setNombreCompleto(fullName);
+
+            return dto;
+        }
+        if (idEjecutor > 0) {
+            sesionServicio.validacionEmpleado(idEjecutor, 4);
+            return null;
+        }
+
+        dto.setNombre(full.getPNombre());
+        dto.setApellido(full.getPApellido());
+        dto.setEstato(full.getEstado());
+        dto.setNvlPermiso(full.getNvlPermiso());
+
+        return dto;
+    }
+
     
     // AÑADIR DIRECCION DE ENVIO
-    public String addDireccion(Long id, Direccion dir) {
+    public Direccion addDireccion(Long id, Direccion dir) {
         // Verifica que el cliente existe
         sesionServicio.validacionCliente(id);
 
@@ -57,7 +125,7 @@ public class ClienteServicio {
         // Agrega la direccion y genera respuesta para controlador
         cli.getDirecciones().add(dir);
         usuarioRepo.save(cli);
-        return "Dirección añadida correctamente a "+ cli.getPNombre() +" como '"+ dir.getEtiqueta() +'\'';
+        return dir;
     }
 
     // OBTENER DIRECCIONES DE ENVIO DE UN CLIENTE

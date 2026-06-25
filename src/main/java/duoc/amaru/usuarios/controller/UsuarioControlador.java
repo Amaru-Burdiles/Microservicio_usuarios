@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import duoc.amaru.usuarios.dto.GetClienteDTO;
 import duoc.amaru.usuarios.dto.LogInDTO;
 import duoc.amaru.usuarios.dto.UpdateDirDTO;
 import duoc.amaru.usuarios.model.Cliente;
@@ -92,8 +93,11 @@ public class UsuarioControlador {
     // AGREGAR DIRECCION DE ENVIO A CLIENTE
     @PostMapping("/user{userId}/direccion/add")
     public ResponseEntity<?> postDireccionEnvio(@Valid @RequestBody Direccion direccion, @PathVariable Long userId) {
-        String respuesta = clienteServicio.addDireccion(userId, direccion);
-        return ResponseEntity.status(201).body(respuesta);
+        Direccion resultado = clienteServicio.addDireccion(userId, direccion);
+        GetClienteDTO cli = clienteServicio.getClienteById(0L, userId);
+        
+        String reply = "Dirección añadida correctamente a "+ cli.getNombre() +" como \""+ resultado.getEtiqueta() +'\"';
+        return ResponseEntity.status(201).body(reply);
     }
 
     // OBTENER DIRECCIONES DE ENVIO DE CLIENTE
