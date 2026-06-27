@@ -16,7 +16,7 @@ public class SesionControlador {
     private SesionServicio sesionServicio;
 
     // VALIDAR EMPLEADOS Y SU NIVEL DE ACCESO
-    @GetMapping("/validacion-empleado/exe:{executorId}/filter:{lvl}")
+    @GetMapping("/validacion-empleado/exe:{ejecutor}/filter:{lvl}")
     public boolean validarEmpleado(@PathVariable Long ejecutor, @PathVariable int lvl) {
         return sesionServicio.validacionEmpleado(ejecutor, lvl);
     }
