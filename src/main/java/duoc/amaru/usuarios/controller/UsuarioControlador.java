@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import duoc.amaru.usuarios.dto.GetClienteDTO;
+import duoc.amaru.usuarios.dto.GetDireccionDTO;
 import duoc.amaru.usuarios.dto.LogInDTO;
 import duoc.amaru.usuarios.dto.UpdateDirDTO;
 import duoc.amaru.usuarios.model.Cliente;
@@ -103,25 +104,41 @@ public class UsuarioControlador {
     // OBTENER DIRECCIONES DE ENVIO DE CLIENTE
     @GetMapping("/user{userId}/direcciones")
     public ResponseEntity<?> getDireccionesEnvio(@PathVariable Long userId) {
-        return clienteServicio.getDirecciones(userId);
+        List<GetDireccionDTO> reply = clienteServicio.getDirecciones(userId);
+        if (reply.isEmpty())
+            return ResponseEntity.ok("No hay direcciones de envío guardadas");
+
+        int cant = reply.size();
+        String respuesta = cant +(cant == 1 ? " dirección de envío guardada:\n" : " direcciones de envío guardadas:\n") + reply;
+        return ResponseEntity.ok(respuesta);
     }
 
     // OBTENER DETALLE DE DIRECCION DE ENVIO DE CLIENTE
     @GetMapping("/user{userId}/direccion/{dirId}")
     public ResponseEntity<?> getDireccionEnvio(@PathVariable Long userId, @PathVariable Long dirId) {
-        return clienteServicio.getDireccion(userId, dirId);
+        Direccion reply = clienteServicio.getDireccion(userId, dirId);
+        if (reply == null)
+            return ResponseEntity.status(404).body("Dirección no encontrada");
+        return ResponseEntity.ok(reply);
     }
 
     // ACTUALIZAR DIRECCION DE ENVIO DE CLIENTE
     @PutMapping("/user{userId}/direccion{dirId}/update")
     public ResponseEntity<?> putDireccionEnvio(@Valid @RequestBody UpdateDirDTO direccion, @PathVariable Long userId, @PathVariable Long dirId) {
-        return clienteServicio.updateDireccion(userId, direccion, dirId);
+        Direccion reply = clienteServicio.updateDireccion(userId, direccion, dirId);
+        if (reply == null)
+            return ResponseEntity.status(404).body("Dirección no encontrada");
+        return ResponseEntity.ok("Dirección actualizada correctamente");
     }
 
     // QUITAR DIRECCION DE ENVIO DE CLIENTE
     @DeleteMapping("/user{userId}/direccion{dirId}/del")
     public ResponseEntity<?> deleteDireccionEnvio(@PathVariable Long userId, @PathVariable Long dirId) {
-        return clienteServicio.deleteDireccion(userId, dirId);
+        Cliente reply = clienteServicio.deleteDireccion(userId, dirId);
+        if (reply != null)
+            return ResponseEntity.ok("Dirección eliminada correctamente");
+
+        return ResponseEntity.status(404).body("Dirección no encontrada");
     }
 
     // DESACTIVAR USUARIO

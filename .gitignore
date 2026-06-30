@@ -1,2 +1,5 @@
 # Ignorar ajustes del espacio de trabajo
 .vscode/settings.json
+
+# Ignora el paquete target
+/target/

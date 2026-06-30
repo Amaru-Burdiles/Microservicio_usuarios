@@ -3,6 +3,7 @@ package duoc.amaru.usuarios.model;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -19,7 +20,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "cliente")
 public class Cliente extends Usuario {
 
-    @OneToMany
+    // if (clienteRepo.save(cliente)) 
+    //    then guarda o actualiza todas sus direcciones
+    // if (clienteRepo.remove(cliente) or cliente.getDirecciones.remove(dir)) 
+    //    then elimina las direcciones apropiadas
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cliente_id")
     private List<Direccion> direcciones;
 

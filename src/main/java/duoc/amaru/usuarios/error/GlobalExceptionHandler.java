@@ -14,6 +14,7 @@ import duoc.amaru.usuarios.error.exceptions.ClientesOnlyException;
 import duoc.amaru.usuarios.error.exceptions.EmployeesOnlyException;
 import duoc.amaru.usuarios.error.exceptions.NotLoggedInException;
 import duoc.amaru.usuarios.error.exceptions.NotSignedInException;
+import duoc.amaru.usuarios.error.exceptions.SinCambiosException;
 import duoc.amaru.usuarios.error.exceptions.SinPermisosException;
 
 @RestControllerAdvice
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
 
         return errores;
     }
-    // Exceptions de Session
+    // EXCEPCIONES DE SERVICIO SESIÓN
     @ExceptionHandler(ClientesOnlyException.class)
     public ResponseEntity<String> validSoloClientes(ClientesOnlyException ex) {
         return ResponseEntity.status(403).body(ex.getMessage());
@@ -54,5 +55,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SinPermisosException.class)
     public ResponseEntity<String> validPermisos(SinPermisosException ex) {
         return ResponseEntity.status(403).body(ex.getMessage());
+    }
+
+    // EXCEPCIÓN DE SERVICIO CLIENTE
+    @ExceptionHandler(SinCambiosException.class)
+    public ResponseEntity<String> sinCambios(SinCambiosException ex) {
+        return ResponseEntity.badRequest().body("No hay cambios para actualizar");
     }
 }
