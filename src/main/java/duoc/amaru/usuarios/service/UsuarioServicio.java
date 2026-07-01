@@ -49,10 +49,7 @@ public class UsuarioServicio {
         return logging;
     }
 
-    public List<Usuario> readAllUsers() {
-        return usuarioRepo.findAll();
-    }
-
+    
     // CERRAR SESION
     public Usuario cerrarSesion(Long id) {
         // Quien intenta cerrar sesion
@@ -61,7 +58,7 @@ public class UsuarioServicio {
         // Validacion Id de usuario existe
         if (user == null)
             throw new NotSignedInException();
-
+        
         // Validación el usuario tiene la sesión iniciada?
         if (!sesionServicio.isLoggedIn(id))
             return null;
@@ -69,5 +66,11 @@ public class UsuarioServicio {
         // Cierre de sesión y respuesta al controlador
         sesionServicio.logOut(id);
         return user;
+    }
+
+    
+    // TODO: Descrubrir si este metodo es utilizado y para qué
+    public List<Usuario> readAllUsers() {
+        return usuarioRepo.findAll();
     }
 }
