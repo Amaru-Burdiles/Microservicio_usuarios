@@ -39,7 +39,8 @@ public class UsuarioControlador {
 
     @Autowired
     private EmpleadoServicio empleadoServicio;
-    
+
+
     // OBTENER USUARIOS (TESTING)
     @GetMapping
     public ResponseEntity<?> getUsuarios() {
@@ -63,7 +64,12 @@ public class UsuarioControlador {
     // REGISTRAR EMPLEADO
     @PostMapping("/signin/{id}")
     public ResponseEntity<?> postRegistrarEmpleado(@Valid @RequestBody Empleado newEmpleado, @PathVariable Long id) {
-        return empleadoServicio.registrarUsuario(id, newEmpleado);
+        Empleado reply = empleadoServicio.registrarUsuario(id, newEmpleado);
+
+        if (reply == null)
+            return ResponseEntity.status(400).body("El correo ingresado ya está registrado");
+
+        return ResponseEntity.status(201).body("Usuario registrado exitosamente");
     }
     
     
@@ -94,13 +100,23 @@ public class UsuarioControlador {
     // ACTUALIZAR PERMISOS DE USUARIO
     @PutMapping("/user{userId}:config/access{nvl}/{executorId}")
     public ResponseEntity<?> putConfigUsuario(@PathVariable Long userId, @PathVariable int nvl, @PathVariable Long executor) {
-        return empleadoServicio.updateUsusario(userId, nvl, executor);
+        Usuario reply = empleadoServicio.updateUsusario(userId, nvl, executor);
+
+        if (reply == null)
+            return ResponseEntity.status(400).body("Nuevo nivel de acceso fuera de rango");
+
+        return ResponseEntity.ok("Permisos actualizados para usuario "+ reply.getPNombre() +" "+ reply.getPApellido());
     }
 
     // ACTUALIZAR CARGO DE EMPLEADO
     @PutMapping("/user{userId}:config/cargo:{cargo}/{executorId}")
     public ResponseEntity<?> putCargoEmpleado(@PathVariable Long empId, @PathVariable String cargo, @PathVariable Long executor) {
-        return empleadoServicio.updateUsuario(empId, cargo, executor);
+        Empleado reply = empleadoServicio.updateUsuario(empId, cargo, executor);
+
+        if (reply == null)
+            return ResponseEntity.status(400).body("Cargo inválido");
+
+        return ResponseEntity.ok("Cargo actualizado para empleado "+ reply.getPNombre() +" "+ reply.getPApellido());
     }
 
     // AGREGAR DIRECCION DE ENVIO A CLIENTE
@@ -156,12 +172,15 @@ public class UsuarioControlador {
     // DESACTIVAR USUARIO
     @PutMapping("/user{userId}:desactivar/{executorId}")
     public ResponseEntity<?> putDesactivarUser(@PathVariable Long userId, @PathVariable Long executorId) {
-        return empleadoServicio.desactivarUser(userId, executorId);
+        Usuario reply = empleadoServicio.desactivarUser(userId, executorId);
+        return ResponseEntity.ok("La cuenta de "+ reply.getPNombre() +" "+ reply.getPApellido() +" ha sido desactivada"); 
     }
 
     // ELIMINAR USUARIO
     @DeleteMapping("/user{userId}:eliminar/{executorId}")
     public ResponseEntity<?> deleteUsuario(@PathVariable Long userId, @PathVariable Long executorId) {
-        return empleadoServicio.eliminarUser(userId, executorId);
+        empleadoServicio.eliminarUser(userId, executorId);
+
+        return ResponseEntity.ok("Usuario con Id #"+ userId +" eliminado");
     }
 }

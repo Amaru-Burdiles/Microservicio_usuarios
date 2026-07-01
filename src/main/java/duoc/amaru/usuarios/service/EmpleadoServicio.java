@@ -4,9 +4,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import duoc.amaru.usuarios.error.exceptions.NotSignedInException;
 import duoc.amaru.usuarios.model.Empleado;
 import duoc.amaru.usuarios.model.Usuario;
 import duoc.amaru.usuarios.repository.EmpleadoRepo;
@@ -32,90 +32,89 @@ public class EmpleadoServicio {
     
     
     // REGISTRO DE EMPLEADOS
-    public ResponseEntity<?> registrarUsuario(Long id, Empleado newEmpleado) {
+    public Empleado registrarUsuario(Long id, Empleado newEmpleado) {
         // # VALIDACION DE PERMISOS
         sesionServicio.validacionEmpleado(id, 3);
 
         // # VALIDACION DE EMPLEADO NUEVO
         // Verificar que el correo no esté registrado
         if (usuarioRepo.existsByCorreo(newEmpleado.getCorreo()))
-            return ResponseEntity.status(400).body("El correo ingresado ya está registrado");
+            return null;
 
         // Config usuario nuevo por defecto
         newEmpleado.setEstado("activo");
         evaluarCargo(newEmpleado.getCargo(), newEmpleado);
 
         // Guardar usuario nuevo y respuesta al controlador
-        usuarioRepo.save(newEmpleado);
-        return ResponseEntity.status(201).body("Usuario registrado exitosamente");
+        return usuarioRepo.save(newEmpleado);
     }
 
     // ACTUALIZAR PERMISOS DE USUARIO
-    public ResponseEntity<?> updateUsusario(Long userId, int nvl, Long executor) {
+    public Usuario updateUsusario(Long userId, int nvl, Long executor) {
         // Validar permisos del ejecutor
         sesionServicio.validacionEmpleado(executor, 4);
 
         // Validar que el usuario a actualizar existe
         Optional<Usuario> updating = usuarioRepo.findById(userId);
         if (!updating.isPresent())
-            return ResponseEntity.status(404).body("No se hayó usuario con Id #"+ userId);
+            throw new NotSignedInException();
 
         // Validar nuevo nvl
         if (!allowedLvls.contains(nvl))
-            return ResponseEntity.status(400).body("Nuevo nivel de acceso fuera de rango");
+            return null;
 
         Usuario user = updating.get();
         user.setNvlPermiso(nvl);
-        return ResponseEntity.ok("Permisos actualizados para usuario "+ user.getPNombre());
+        return usuarioRepo.save(user);
     }
 
     // ACTUALIZAR CARGO EMPLEADO
-    public ResponseEntity<?> updateUsuario(Long empId, String cargo, Long executor) {
+    public Empleado updateUsuario(Long empId, String cargo, Long executor) {
         // Validar permisos del ejecutor
         sesionServicio.validacionEmpleado(executor, 4);
 
         // Validar que empleado a actualizar existe
         Optional<Empleado> updating = empleadoRepo.findById(empId);
         if (!updating.isPresent())
-            return ResponseEntity.status(404).body("No se hayó empleado con Id #"+ empId);
+            throw new NotSignedInException();
 
         // Validar nuevo cargo
         if (!allowedCargos.contains(cargo.toLowerCase()))
-            return ResponseEntity.status(400).body("Cargo inválido");
+            return null;
 
         Empleado emp = updating.get();
         emp.setCargo(cargo);
-        return ResponseEntity.ok("Cargo actualizado para empleado "+ emp.getPNombre());
+        return empleadoRepo.save(emp);
     }
     
     // DESACTIVAR USUARIOS
-    public ResponseEntity<?> desactivarUser(Long userId, Long executorId) {
+    public Usuario desactivarUser(Long userId, Long executorId) {
         // Validar permisos del ejecutor
         sesionServicio.validacionEmpleado(executorId, 4);
 
         // Validar que usuario a desactivar existe
         Optional<Usuario> disabling = usuarioRepo.findById(userId);
         if (!disabling.isPresent())
-            return ResponseEntity.status(404).body("No se hayó usuario con Id #"+ userId);
+            throw new NotSignedInException();
 
         Usuario user = disabling.get();
         user.setEstado("Desactivado");
         sesionServicio.logOut(userId);
-        return ResponseEntity.ok("La cuenta de "+ user.getPNombre() +" ha sido desactivada"); 
+        return usuarioRepo.save(user);
     }
 
     // ELIMINAR USUARIOS
-    public ResponseEntity<?> eliminarUser(Long userId, Long executorId) {
+    public boolean eliminarUser(Long userId, Long executorId) {
         // Validar permisos del ejecutor
         sesionServicio.validacionEmpleado(executorId, 4);
 
         // Validar que usuario a desactivar existe
         Optional<Usuario> deleting = usuarioRepo.findById(userId);
         if (!deleting.isPresent())
-            return ResponseEntity.status(404).body("No se hayó usuario con Id #"+ userId);
+            throw new NotSignedInException();
 
         usuarioRepo.delete(deleting.get());
-        return ResponseEntity.ok("Usuario con Id #"+ userId +" eliminado");
+        return true;
     }
 
     // AUTO CONFIG DE PERMISOS Y CARGO
