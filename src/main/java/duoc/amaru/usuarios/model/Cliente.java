@@ -1,5 +1,6 @@
 package duoc.amaru.usuarios.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,13 +27,14 @@ public class Cliente extends Usuario {
     //    then elimina las direcciones apropiadas
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cliente_id")
-    private List<Direccion> direcciones;
+    private List<Direccion> direcciones = new ArrayList<>();
 
     @Transient
     private final AtomicInteger tagId = new AtomicInteger(1);
 
     public Cliente(Long id, String rut, String pNomb, String sNomb, String pApel, String sApel, String mail, String password, String telefono, String estado, int nvlPermiso, List<Direccion> direcciones) {
         super(id, rut, pNomb, sNomb, pApel, sApel, mail, password, telefono, estado, nvlPermiso);
-        this.direcciones = direcciones;
+        if (direcciones != null)
+            this.direcciones = direcciones;
     }
 }

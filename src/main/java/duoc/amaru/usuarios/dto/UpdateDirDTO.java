@@ -16,7 +16,7 @@ public class UpdateDirDTO {
     private String calle;
     private int numCalle;
 
-    @Min(value = 1, message = "El número de casa o departamento debe ser al menos 1")
+    @Min(value = 0, message = "El número de casa o departamento debe ser al menos 1")
     @Max(value = 9999, message = "El número de casa o departamento no puede exceder 9999")
     private int numCasaDpto;
     private String detalle;

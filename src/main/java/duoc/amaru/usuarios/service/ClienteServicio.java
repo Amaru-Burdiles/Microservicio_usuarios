@@ -70,7 +70,6 @@ public class ClienteServicio {
     public GetClienteDTO getClienteById(Long idEjecutor, Long idBuscar) {
         if (idEjecutor > 0) {
             sesionServicio.validacionUsuario(idEjecutor);
-            return null;
         }
 
         // Obtiene al cliente completo
@@ -93,9 +92,9 @@ public class ClienteServicio {
             dto.setPassword(full.getPassword());
             
             // Concatena los nombres
-            String fullName = full.getPNombre() + (full.getSNombre().isEmpty() ? ' ' : ' '+full.getSNombre() +' ');
+            String fullName = full.getPNombre() + (full.getSNombre() == null ? ' ' : ' '+full.getSNombre() +' ');
             // A eso le concatena los apellidos
-            fullName += full.getPApellido() + (!full.getSApellido().isEmpty() ? ' '+full.getSApellido() : "");
+            fullName += full.getPApellido() + (full.getSApellido() == null ? "" : ' '+full.getSApellido());
             dto.setNombreCompleto(fullName);
 
             return dto;
@@ -103,14 +102,13 @@ public class ClienteServicio {
         // Validar idEjecutor es admin o system
         if (idEjecutor > 0) {
             sesionServicio.validacionEmpleado(idEjecutor, 4);
-            return null;
         }
 
         // Rellena con info útil para administradores
         dto.setNombre(full.getPNombre());
         dto.setApellido(full.getPApellido());
         dto.setEstato(full.getEstado());
-        dto.setNvlPermiso(full.getNvlPermiso());
+        dto.setNvlPermiso(String.valueOf(full.getNvlPermiso()));
 
         return dto;
     }
@@ -125,13 +123,13 @@ public class ClienteServicio {
         Cliente cli = clienteRepo.findById(id).get();
 
         // Si la etiqueta de direccion esta vacía, genera una por defecto
-        if (dir.getEtiqueta().isBlank()) {
+        if (dir.getEtiqueta() == null || dir.getEtiqueta().isBlank()) {
             String tag = "Dirección #" + cli.getTagId().getAndIncrement();
             dir.setEtiqueta(tag);
         }
 
         // Agrega la direccion a la lista de Cliente
-        cli.getDirecciones().add(dir);
+        cli.getDirecciones().add(direccionRepo.save(dir));
         clienteRepo.save(cli);
 
         //  y genera respuesta para controlador
@@ -163,7 +161,7 @@ public class ClienteServicio {
         sesionServicio.validacionCliente(userId);
 
         // Buscar direccion por id
-        Direccion dir = direccionRepo.findById(dirId).get();
+        Direccion dir = direccionRepo.findById(dirId).orElse(null);
         if (dir != null) {
             return dir;
         }
@@ -176,7 +174,7 @@ public class ClienteServicio {
         sesionServicio.validacionCliente(userId);
 
         // Buscar y validar direccion existe por id
-        Direccion former = direccionRepo.findById(dirId).get();
+        Direccion former = direccionRepo.findById(dirId).orElse(null);
         if (former == null) {
             return null;
         }
@@ -196,19 +194,29 @@ public class ClienteServicio {
             throw new SinCambiosException();
 
         // Obtener cliente al que pertenece la direccion
-        Cliente cli = clienteRepo.findById(dirId).get();
+        Cliente cli = clienteRepo.findById(userId).get();
         
         // Encontrar la posicion de la direccion en la lista
         int i = cli.getDirecciones().indexOf(former);
         
         // Aplicar cambios a former
-        former.setEtiqueta(nueva.getEtiqueta());
-        former.setCalle(nueva.getCalle());
+        if (nueva.getEtiqueta() != null)
+            former.setEtiqueta(nueva.getEtiqueta());
+
+        if (nueva.getCalle() != null)
+            former.setCalle(nueva.getCalle());
+
+        if (nueva.getNumCasaDpto() != 0)
+            former.setNCasaDpto(nueva.getNumCasaDpto());
+        
+        if (nueva.getComuna() != null)
+            former.setComuna(nueva.getComuna());
+        
+        if (nueva.getRegion() != null)
+            former.setRegion(nueva.getRegion());
+        
         former.setNCalle(nueva.getNumCalle());
-        former.setNCasaDpto(nueva.getNumCasaDpto());
         former.setDetalle(nueva.getDetalle());
-        former.setComuna(nueva.getComuna());
-        former.setRegion(nueva.getRegion());
         
         // Reemplazar en la lista
         cli.getDirecciones().set(i, former);
@@ -224,15 +232,14 @@ public class ClienteServicio {
         sesionServicio.validacionCliente(userId);
 
         // Buscar direccion por id
-        Direccion dir = direccionRepo.findById(dirId).get();
+        Direccion dir = direccionRepo.findById(dirId).orElse(null);
         if (dir == null) {
             return null;
         }
 
         // Eliminar direccion y respuesta al controlador
-        Cliente cli = clienteRepo.findById(dirId).get();
+        Cliente cli = clienteRepo.findById(userId).get();
         cli.getDirecciones().remove(dir);
-        clienteRepo.save(cli);
-        return cli;
+        return clienteRepo.save(cli);
     }
 }

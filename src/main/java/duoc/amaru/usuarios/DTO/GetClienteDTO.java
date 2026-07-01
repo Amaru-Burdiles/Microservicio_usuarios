@@ -27,5 +27,5 @@ public class GetClienteDTO {
     private String nombre;
     private String apellido;
     private String estato;
-    private int nvlPermiso;
+    private String nvlPermiso;
 }
