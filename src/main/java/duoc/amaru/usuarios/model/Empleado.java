@@ -6,15 +6,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "empleado")
 public class Empleado extends Usuario {
@@ -25,5 +21,27 @@ public class Empleado extends Usuario {
 
     @Column(name = "hire_date_emp")
     private LocalDate hirDate;
+
+    public Empleado(Long id,
+                    String rut,
+                    String pNomb,
+                    String sNomb,
+                    String pApel,
+                    String sApel,
+                    String mail,
+                    String password,
+                    String telefono,
+                    String estado,
+                    int nvlPermiso,
+                    String cargo,
+                    LocalDate hirDate) {
+        super(id, rut, pNomb, sNomb, pApel, sApel, cargo, password, telefono, estado, nvlPermiso);
+        this.cargo = cargo;
+        this.hirDate = hirDate;
+    }
+
+    public Empleado() {
+        super();
+    }
 
 }

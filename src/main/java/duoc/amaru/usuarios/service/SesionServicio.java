@@ -73,7 +73,7 @@ public class SesionServicio {
             throw new NotLoggedInException();
 
         // Valida que el empleado tiene permisos suficientes
-        Empleado emp = empleadoRepo.getReferenceById(executorId);
+        Empleado emp = empleadoRepo.findById(executorId).get();
         if (emp.getNvlPermiso() < lvlFilter)
             throw new SinPermisosException();
 
