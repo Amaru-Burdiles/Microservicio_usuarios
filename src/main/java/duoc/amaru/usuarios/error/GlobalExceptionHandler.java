@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import duoc.amaru.usuarios.error.exceptions.ClientesOnlyException;
+import duoc.amaru.usuarios.error.exceptions.DisabledUserException;
+import duoc.amaru.usuarios.error.exceptions.EmailNotFoundException;
 import duoc.amaru.usuarios.error.exceptions.EmployeesOnlyException;
 import duoc.amaru.usuarios.error.exceptions.NotLoggedInException;
 import duoc.amaru.usuarios.error.exceptions.NotSignedInException;
 import duoc.amaru.usuarios.error.exceptions.SinCambiosException;
 import duoc.amaru.usuarios.error.exceptions.SinPermisosException;
+import duoc.amaru.usuarios.error.exceptions.WrongPasswordException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -61,5 +64,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SinCambiosException.class)
     public ResponseEntity<String> sinCambios(SinCambiosException ex) {
         return ResponseEntity.badRequest().body("No hay cambios para actualizar");
+    }
+
+    // EXCEPCIÓN DE SERVICIO USUARIO
+    @ExceptionHandler(DisabledUserException.class)
+    public ResponseEntity<String> cuentaDesactivado(DisabledUserException ex) {
+        return ResponseEntity.status(403).body("Esta cuenta se encuentra desactivada");
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<String> correoNoRegistrado(EmailNotFoundException ex) {
+        return ResponseEntity.status(404).body("El correo ingresado no está registrado");
+    }
+
+    @ExceptionHandler(WrongPasswordException.class)
+    public ResponseEntity<String> wrongPassword(WrongPasswordException ex) {
+        return ResponseEntity.status(401).body("La contraseña es incorrecta");
     }
 }

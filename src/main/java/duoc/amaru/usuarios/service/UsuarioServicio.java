@@ -1,12 +1,14 @@
 package duoc.amaru.usuarios.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import duoc.amaru.usuarios.error.exceptions.DisabledUserException;
+import duoc.amaru.usuarios.error.exceptions.EmailNotFoundException;
+import duoc.amaru.usuarios.error.exceptions.NotSignedInException;
+import duoc.amaru.usuarios.error.exceptions.WrongPasswordException;
 import duoc.amaru.usuarios.model.Usuario;
 import duoc.amaru.usuarios.repository.UsuarioRepo;
 
@@ -19,33 +21,32 @@ public class UsuarioServicio {
     private SesionServicio sesionServicio;
 
     // INICIAR SESION
-    public ResponseEntity<?> iniciarSesion(String correo, String password) {
+    public Usuario iniciarSesion(String correo, String password) {
         // Quien intenta iniciar sesión
         Usuario logging = usuarioRepo.findByCorreo(correo); 
         
         // Determinar si el correo está registrado
         if (logging == null)
-            return ResponseEntity.status(404).body("El correo ingresado no está registrado");
+            throw new EmailNotFoundException();
         
         // Contraseña incorrecta
         if (!logging.getPassword().equals(password))
-            return ResponseEntity.status(401).body("La contraseña es incorrecta");
+            throw new WrongPasswordException();
 
         // Validación usuario desactivado
         if (logging.getEstado().equals("Desactivado"))
-            return ResponseEntity.status(403).body("Esta cuenta se encuentra desactivada");
+            throw new DisabledUserException();
         
         // Id del Usuario
         Long id = logging.getId();
 
         // Validación sesión ya iniciada?
         if (sesionServicio.isLoggedIn(id))
-            return ResponseEntity.status(400).body("Su sesión ya está iniciada");
+            return null;
 
         // Inicio de sesión y mensaje al controlador
         sesionServicio.logIn(id);
-        String reply = "Iniciaste sesión como <"+ logging.getPNombre() +"> con Id: #"+ id;
-        return ResponseEntity.ok(reply);
+        return logging;
     }
 
     public List<Usuario> readAllUsers() {
@@ -53,21 +54,20 @@ public class UsuarioServicio {
     }
 
     // CERRAR SESION
-    public ResponseEntity<?> cerrarSesion(Long id) {
+    public Usuario cerrarSesion(Long id) {
         // Quien intenta cerrar sesion
-        Optional<Usuario> user = usuarioRepo.findById(id);
+        Usuario user = usuarioRepo.findById(id).orElse(null);
         
         // Validacion Id de usuario existe
-        if (!user.isPresent())
-            return ResponseEntity.status(404).body("Usuario no encontrado");
+        if (user == null)
+            throw new NotSignedInException();
 
         // Validación el usuario tiene la sesión iniciada?
         if (!sesionServicio.isLoggedIn(id))
-            return ResponseEntity.status(401).body("Usuario no autenticado. La sesión ya está cerrada");
+            return null;
         
         // Cierre de sesión y respuesta al controlador
         sesionServicio.logOut(id);
-        String reply = "Se cerró la sesión de "+ user.get().getPNombre();
-        return ResponseEntity.status(200).body(reply);
+        return user;
     }
 }

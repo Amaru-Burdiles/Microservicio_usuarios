@@ -55,7 +55,7 @@ public class UsuarioControlador {
     public ResponseEntity<?> postRegistrarCliente(@Valid @RequestBody Cliente newCliente) {
         Cliente serviceReply = clienteServicio.registrarUsuario(newCliente);
         if (serviceReply == null)
-            return ResponseEntity.status(400).body("El correo ingresado ya está registrado");
+            return ResponseEntity.badRequest().body("El correo ingresado ya está registrado");
         
         return ResponseEntity.status(201).body("Usuario registrado exitosamente");
     }
@@ -70,13 +70,25 @@ public class UsuarioControlador {
     // INICIAR SESION
     @PostMapping("/login")
     public ResponseEntity<?> postInicioSesion(@Valid @RequestBody LogInDTO logInDTO) {
-        return usuarioServicio.iniciarSesion(logInDTO.getCorreo(), logInDTO.getPassword());
+        Usuario reply = usuarioServicio.iniciarSesion(logInDTO.getCorreo(), logInDTO.getPassword());
+
+        if (reply == null)
+            return ResponseEntity.badRequest().body("Su sesión ya está iniciada");
+
+        String respuesta = "Iniciaste sesión como <"+ reply.getPNombre() +"> con Id: #"+ reply.getId();
+        return ResponseEntity.ok(respuesta);
     }
 
     // CERRAR SESION
     @GetMapping("/logout/{id}")
     public ResponseEntity<?> getCerrarSesion(@PathVariable Long id) {
-        return usuarioServicio.cerrarSesion(id);
+        Usuario reply = usuarioServicio.cerrarSesion(id);
+
+        if (reply == null)
+            return ResponseEntity.status(401).body("Usuario no autenticado. La sesión ya está cerrada");
+
+        String respuesta = "Se cerró la sesión de "+ reply.getPNombre();
+        return ResponseEntity.status(200).body(respuesta);
     }
     
     // ACTUALIZAR PERMISOS DE USUARIO
