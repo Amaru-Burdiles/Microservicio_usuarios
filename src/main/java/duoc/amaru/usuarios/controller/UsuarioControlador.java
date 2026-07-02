@@ -100,7 +100,7 @@ public class UsuarioControlador {
     // ACTUALIZAR PERMISOS DE USUARIO
     @PutMapping("/user{userId}:config/access{nvl}/{executorId}")
     public ResponseEntity<?> putConfigUsuario(@PathVariable Long userId, @PathVariable int nvl, @PathVariable Long executor) {
-        Usuario reply = empleadoServicio.updateUsusario(userId, nvl, executor);
+        Usuario reply = empleadoServicio.updateUsuario(userId, nvl, executor);
 
         if (reply == null)
             return ResponseEntity.status(400).body("Nuevo nivel de acceso fuera de rango");
@@ -179,8 +179,9 @@ public class UsuarioControlador {
     // ELIMINAR USUARIO
     @DeleteMapping("/user{userId}:eliminar/{executorId}")
     public ResponseEntity<?> deleteUsuario(@PathVariable Long userId, @PathVariable Long executorId) {
-        empleadoServicio.eliminarUser(userId, executorId);
-
-        return ResponseEntity.ok("Usuario con Id #"+ userId +" eliminado");
+        boolean reply = empleadoServicio.eliminarUser(userId, executorId);
+        if (reply)
+            return ResponseEntity.ok("Usuario con Id #"+ userId +" eliminado");
+        return ResponseEntity.status(404).body("No se hayó un usuario con Id #"+ userId);
     }
 }

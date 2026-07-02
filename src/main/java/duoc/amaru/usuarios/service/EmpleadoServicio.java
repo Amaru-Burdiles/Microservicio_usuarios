@@ -42,7 +42,7 @@ public class EmpleadoServicio {
             return null;
 
         // Config usuario nuevo por defecto
-        newEmpleado.setEstado("activo");
+        newEmpleado.setEstado("Activo");
         evaluarCargo(newEmpleado.getCargo(), newEmpleado);
 
         // Guardar usuario nuevo y respuesta al controlador
@@ -50,7 +50,7 @@ public class EmpleadoServicio {
     }
 
     // ACTUALIZAR PERMISOS DE USUARIO
-    public Usuario updateUsusario(Long userId, int nvl, Long executor) {
+    public Usuario updateUsuario(Long userId, int nvl, Long executor) {
         // Validar permisos del ejecutor
         sesionServicio.validacionEmpleado(executor, 4);
 
@@ -111,7 +111,7 @@ public class EmpleadoServicio {
         // Validar que usuario a desactivar existe
         Optional<Usuario> deleting = usuarioRepo.findById(userId);
         if (!deleting.isPresent())
-            throw new NotSignedInException();
+            return false;
 
         usuarioRepo.delete(deleting.get());
         return true;
@@ -120,18 +120,19 @@ public class EmpleadoServicio {
     // AUTO CONFIG DE PERMISOS Y CARGO
     private void evaluarCargo(String cargo, Empleado emp) {
         if (cargo.equalsIgnoreCase("admin")) {
-            emp.setCargo("Admin");
+            emp.setCargo("admin");
             emp.setNvlPermiso(4);
             return;
         }
 
         if (cargo.equalsIgnoreCase("gerente")) {
-            emp.setCargo("Gerente");
+            emp.setCargo("gerente");
             emp.setNvlPermiso(3);
             return;
         }
 
-        emp.setCargo("Encargado de Ventas");
+        // cargo por defecto
+        emp.setCargo("encargado de ventas");
         emp.setNvlPermiso(2);
     }
 

@@ -35,7 +35,7 @@ public class Empleado extends Usuario {
                     int nvlPermiso,
                     String cargo,
                     LocalDate hirDate) {
-        super(id, rut, pNomb, sNomb, pApel, sApel, cargo, password, telefono, estado, nvlPermiso);
+        super(id, rut, pNomb, sNomb, pApel, sApel, mail, password, telefono, estado, nvlPermiso);
         this.cargo = cargo;
         this.hirDate = hirDate;
     }
