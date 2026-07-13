@@ -122,6 +122,44 @@ public class EmpleadoServicioTest {
     }
 
 
+    // TEST REGISTRAR EMPLEADO (EXITOSO: ADMIN)
+    @Test
+    void testRegistrarEmpleadoAdmin() {
+        // Preparación
+        Long admin = 8L;
+        Empleado entrante = new Empleado(null, "21.210.987-6",
+                                         "Alexis", null,
+                                         "Oñate", null,
+                                         "al.onn@gmail.com", "testeo",
+                                         "+56 9 8877 6655", null,
+                                         8, "aDMIn", LocalDate.now());
+
+        // Configuración
+        when(sesionServicio.validacionEmpleado(admin, 3)).thenReturn(true);
+        when(usuarioRepo.existsByCorreo("al.onn@gmail.com")).thenReturn(false);
+        when(usuarioRepo.save(any(Empleado.class)))
+        .thenAnswer(e -> {
+            Empleado input = e.getArgument(0);
+            input.setId(1L);
+            return input;
+        });
+
+        // Testeo
+        Empleado resultado = empleadoServicio.registrarUsuario(admin, entrante);
+
+        // Validación
+        assertNotNull(resultado);
+        assertEquals("admin", resultado.getCargo());
+        assertEquals("Activo", resultado.getEstado());
+        assertEquals(4, resultado.getNvlPermiso());
+        
+        // Verificar
+        verify(sesionServicio, times(1)).validacionEmpleado(admin, 3);
+        verify(usuarioRepo, times(1)).existsByCorreo("al.onn@gmail.com");
+        verify(usuarioRepo, times(1)).save(entrante);
+    }
+
+
     // TEST REGISTRAR EMPLEADO (FALLIDO)
     @Test
     void testRegistrarEmpleadoError() {
@@ -258,9 +296,9 @@ public class EmpleadoServicioTest {
     }
 
 
-    // TEST ACTUALIZAR CARGO EMPLEADO (FALLIDO)
+    // TEST ACTUALIZAR CARGO EMPLEADO (FALLIDO: AUTENTICACIÓN)
     @Test
-    void testUpdateCargoNotFound() {
+    void testUpdateCargoError() {
         // Preparación
         Long admin = 8L;
         Long empleado = 6L;
@@ -286,7 +324,7 @@ public class EmpleadoServicioTest {
 
     // TEST ACTUALIZAR CARGO EMPLEADO (FALLIDO: CARGO INVALIDO)
     @Test
-    void testUpdateCargoError() {
+    void testUpdateCargoNotFound() {
         // Preparación
         Long admin = 8L;
         Long empleado = 6L;
@@ -330,7 +368,7 @@ public class EmpleadoServicioTest {
 
         // Validación
         assertNotNull(resultado);
-        assertEquals("Desactivado", resultado.getEstado());
+        assertEquals("desactivado", resultado.getEstado());
 
         // Verificación
         verify(sesionServicio, times(1)).validacionEmpleado(admin, 4);

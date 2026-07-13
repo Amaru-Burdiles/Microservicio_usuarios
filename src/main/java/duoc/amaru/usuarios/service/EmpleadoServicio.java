@@ -98,7 +98,7 @@ public class EmpleadoServicio {
             throw new NotSignedInException();
 
         Usuario user = disabling.get();
-        user.setEstado("Desactivado");
+        user.setEstado("desactivado");
         sesionServicio.logOut(userId);
         return usuarioRepo.save(user);
     }
@@ -117,7 +117,7 @@ public class EmpleadoServicio {
         return true;
     }
 
-    // AUTO CONFIG DE PERMISOS Y CARGO
+    // AUTO CONFIG DE PERMISOS Y CARGO EN CREACIÓN DE EMPLEADO
     private void evaluarCargo(String cargo, Empleado emp) {
         if (cargo.equalsIgnoreCase("admin")) {
             emp.setCargo("admin");

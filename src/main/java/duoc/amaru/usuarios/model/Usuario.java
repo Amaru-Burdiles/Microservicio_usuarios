@@ -46,14 +46,14 @@ public abstract class Usuario {
     @Size(max = 30)
     private String sNombre;
 
-    @Column(name = "p_apellido_user")
+    @Column(name = "a_paterno_user")
     @NotBlank(message = "El apellido paterno no puede estar vacío")
     @Size(max = 30)
-    private String pApellido;
+    private String aPaterno;
 
-    @Column(name = "s_apellido_user")
+    @Column(name = "a_materno_user")
     @Size(max = 30)
-    private String sApellido;
+    private String aMaterno;
 
     @Column(name = "correo_user", unique = true)
     @NotBlank(message = "El correo es obligatorio")

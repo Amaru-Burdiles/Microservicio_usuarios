@@ -1,7 +1,5 @@
 package duoc.amaru.usuarios.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,9 +66,4 @@ public class UsuarioServicio {
         return user;
     }
 
-    
-    // TODO: Descrubrir si este metodo es utilizado y para qué
-    public List<Usuario> readAllUsers() {
-        return usuarioRepo.findAll();
-    }
 }

@@ -20,7 +20,9 @@ import duoc.amaru.usuarios.error.exceptions.EmployeesOnlyException;
 import duoc.amaru.usuarios.error.exceptions.NotLoggedInException;
 import duoc.amaru.usuarios.error.exceptions.NotSignedInException;
 import duoc.amaru.usuarios.error.exceptions.SinPermisosException;
+import duoc.amaru.usuarios.model.Cliente;
 import duoc.amaru.usuarios.model.Empleado;
+import duoc.amaru.usuarios.model.Usuario;
 import duoc.amaru.usuarios.repository.ClienteRepo;
 import duoc.amaru.usuarios.repository.EmpleadoRepo;
 import duoc.amaru.usuarios.repository.UsuarioRepo;
@@ -47,6 +49,13 @@ public class SesionServicioTest {
     // TEST INICIAR SESION (EXITOSO)
     @Test
     void testIniciarSesion() {
+        // Preparación
+        Usuario user = new Cliente();
+        user.setEstado("activo");
+
+        // Configuración
+        when(usuarioRepo.findById(1L)).thenReturn(Optional.of(user));
+
         // Testeo
         boolean resultado = sesionServicio.logIn(1L);
 
@@ -55,13 +64,36 @@ public class SesionServicioTest {
     }
 
 
+    // TEST INICIAR SESION (FALLIDO: CUENTA DESACTIVADA)
+    @Test
+    void testIniciarSesionDisabled() {
+        // Preparación
+        Usuario user = new Cliente();
+        user.setEstado("desactivado");
+
+        // Configuración
+        when(usuarioRepo.findById(1L)).thenReturn(Optional.of(user));
+
+        // Testeo
+        boolean resultado = sesionServicio.logIn(1L);
+
+        // Validación
+        assertFalse(resultado);
+    }
+
+
     // TEST INICIAR SESION (FALLIDO)
     @Test
     void testIniciarSesionError() {
         // Preparación
-        sesionServicio.logIn(1L);
-
+        Usuario user = new Cliente();
+        user.setEstado("activo");
+        
+        // Configuración
+        when(usuarioRepo.findById(1L)).thenReturn(Optional.of(user));
+        
         // Testeo
+        sesionServicio.logIn(1L);
         boolean resultado = sesionServicio.logIn(1L);
 
         // Validación
@@ -74,10 +106,14 @@ public class SesionServicioTest {
     void testIsLoggedIn() {
         // Preparación
         Long usuario = 1L;
+        Usuario user = new Empleado();
+        user.setEstado("activo");
 
-        sesionServicio.logIn(usuario);
-
+        // Configuración
+        when(usuarioRepo.findById(1L)).thenReturn(Optional.of(user));
+        
         // Testeo
+        sesionServicio.logIn(usuario);
         boolean resultado = sesionServicio.isLoggedIn(usuario);
 
         // Validación
@@ -104,10 +140,14 @@ public class SesionServicioTest {
     void testCerrarSesion() {
         // Preparación
         Long usuario = 1L;
+        Usuario user = new Cliente();
+        user.setEstado("activo");
 
-        sesionServicio.logIn(usuario);
-
+        // Configuración
+        when(usuarioRepo.findById(1L)).thenReturn(Optional.of(user));
+        
         // Testeo
+        sesionServicio.logIn(usuario);
         boolean resultado = sesionServicio.logOut(usuario);
 
         // Validación
@@ -134,13 +174,15 @@ public class SesionServicioTest {
     void testValidarUsuario() {
         // Preparación
         Long usuario = 1L;
-
-        sesionServicio.logIn(usuario);
+        Usuario user = new Cliente();
+        user.setEstado("activo");
 
         // Configuración
+        when(usuarioRepo.findById(1L)).thenReturn(Optional.of(user));
         when(usuarioRepo.existsById(usuario)).thenReturn(true);
-
+        
         // Testeo
+        sesionServicio.logIn(usuario);
         boolean resultado = sesionServicio.validacionUsuario(usuario);
 
         // Validación
@@ -156,13 +198,16 @@ public class SesionServicioTest {
     void testValidarUsuarioNotFound() {
         // Preparación
         Long usuario = 1L;
-
-        sesionServicio.logIn(usuario);
+        Usuario user = new Cliente();
+        user.setEstado("activo");
 
         // Configuración
+        when(usuarioRepo.findById(1L)).thenReturn(Optional.of(user));
         when(usuarioRepo.existsById(usuario)).thenReturn(false);
-
+        
         // Testeo y Validación
+        sesionServicio.logIn(usuario);
+        
         assertThrows(NotSignedInException.class, () -> {
             sesionServicio.validacionUsuario(usuario);
         });
@@ -201,15 +246,16 @@ public class SesionServicioTest {
         Empleado empleado = new Empleado();
         empleado.setId(id);
         empleado.setNvlPermiso(3);
-
-        sesionServicio.logIn(id);
+        empleado.setEstado("activo");
 
         // Configuración
+        when(usuarioRepo.findById(id)).thenReturn(Optional.of(empleado));
         when(usuarioRepo.existsById(id)).thenReturn(true);
         when(empleadoRepo.existsById(id)).thenReturn(true);
         when(empleadoRepo.findById(id)).thenReturn(Optional.of(empleado));
-
+        
         // Testeo
+        sesionServicio.logIn(id);
         boolean resultado = sesionServicio.validacionEmpleado(id, filtro);
 
         // Validación
@@ -298,15 +344,17 @@ public class SesionServicioTest {
         Empleado empleado = new Empleado();
         empleado.setId(id);
         empleado.setNvlPermiso(3);
-
-        sesionServicio.logIn(id);
+        empleado.setCargo("activo");
 
         // Configuración
+        when(usuarioRepo.findById(id)).thenReturn(Optional.of(empleado));
         when(usuarioRepo.existsById(id)).thenReturn(true);
         when(empleadoRepo.existsById(id)).thenReturn(true);
         when(empleadoRepo.findById(id)).thenReturn(Optional.of(empleado));
-
+        
         // Testeo y Validación
+        sesionServicio.logIn(id);
+
         assertThrows(SinPermisosException.class, () -> {
             sesionServicio.validacionEmpleado(id, filtro);
         });
@@ -323,14 +371,16 @@ public class SesionServicioTest {
     void testValidarCliente() {
         // Preparación
         Long cliente = 1L;
-
-        sesionServicio.logIn(cliente);
-
+        Usuario user = new Cliente();
+        user.setEstado("activo");
+        
         // Configuración
+        when(usuarioRepo.findById(cliente)).thenReturn(Optional.of(user));
         when(usuarioRepo.existsById(cliente)).thenReturn(true);
         when(clienteRepo.existsById(cliente)).thenReturn(true);
-
+        
         // Testeo
+        sesionServicio.logIn(cliente);
         boolean resultado = sesionServicio.validacionCliente(cliente);
 
         // Validación
@@ -377,6 +427,31 @@ public class SesionServicioTest {
         });
 
         // Verificación
+        verify(usuarioRepo, times(1)).existsById(cliente);
+        verify(clienteRepo, times(1)).existsById(cliente);
+    }
+
+
+    // TEST VALIDAR CLIENTES (FALLIDO: CLIENTE NO AUTENTICADO)
+    @Test
+    void testValidarClienteNoLogeado() {
+        // Preparación
+        Long cliente = 1L;
+        Usuario user = new Cliente();
+        user.setEstado("activo");
+
+        // Configuración
+        when(usuarioRepo.findById(cliente)).thenReturn(Optional.of(user));
+        when(usuarioRepo.existsById(cliente)).thenReturn(true);
+        when(clienteRepo.existsById(cliente)).thenReturn(true);
+
+        // Testeo
+        assertThrows(NotLoggedInException.class, () -> {
+            sesionServicio.validacionCliente(cliente);
+        });
+
+        // Verificación
+        verify(usuarioRepo, times(0)).findById(cliente);
         verify(usuarioRepo, times(1)).existsById(cliente);
         verify(clienteRepo, times(1)).existsById(cliente);
     }

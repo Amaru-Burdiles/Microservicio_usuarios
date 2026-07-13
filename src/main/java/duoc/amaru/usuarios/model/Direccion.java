@@ -36,6 +36,7 @@ public class Direccion {
     private String calle;
 
     @Column(name = "nCalle_dir")
+    @Min(value = -1)
     private int nCalle;
 
     @Column(name = "nCasaDpto_dir")

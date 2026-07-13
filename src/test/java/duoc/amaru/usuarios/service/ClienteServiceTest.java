@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +26,7 @@ import duoc.amaru.usuarios.dto.GetDireccionDTO;
 import duoc.amaru.usuarios.dto.UpdateDirDTO;
 import duoc.amaru.usuarios.enums.Comuna;
 import duoc.amaru.usuarios.enums.Region;
+import duoc.amaru.usuarios.error.exceptions.SinCambiosException;
 import duoc.amaru.usuarios.model.Cliente;
 import duoc.amaru.usuarios.model.Direccion;
 import duoc.amaru.usuarios.repository.ClienteRepo;
@@ -58,11 +60,14 @@ public class ClienteServiceTest {
     void testRegistrarCliente() {
         // Preparación de Objetos
         Cliente clienteNew = new Cliente(null, "12.123.123-4", "Amaru", null, "Burdiles", null, "a.b@duoc.cl", "testeando", "9 1234 1234", null, 0, null);
-        Cliente clienteSaved = new Cliente(1L, "12.123.123-4", "Amaru", null, "Burdiles", null, "a.b@duoc.cl", "testeando", "9 1234 1234", "activo", 1, null);
 
         // Definición lógica Mockito
-        when(usuarioRepo.save(clienteNew)).thenReturn(clienteSaved);
         when(usuarioRepo.existsByCorreo("a.b@duoc.cl")).thenReturn(false);
+        when(usuarioRepo.save(clienteNew)).thenAnswer(saveArg -> {
+            Cliente saving = saveArg.getArgument(0, Cliente.class);
+            saving.setId(1L);
+            return saving;
+        });
 
         // Ejecutar servicio real
         Cliente resultado = clienteServicio.registrarUsuario(clienteNew);
@@ -70,8 +75,17 @@ public class ClienteServiceTest {
         // El cliente se guardo?
         assertNotNull(resultado);
 
-        // El cliente guardado por el Servicio es igual al esperado?
-        assertEquals(clienteSaved, resultado);
+        // Los valores del cliente ingresado se mantienen despues de guardar
+        assertEquals(clienteNew.getRut(), resultado.getRut());
+        assertEquals(clienteNew.getPNombre(), resultado.getPNombre());
+        assertEquals(clienteNew.getAPaterno(), resultado.getAPaterno());
+        assertEquals(clienteNew.getCorreo(), resultado.getCorreo());
+        assertEquals(clienteNew.getPassword(), resultado.getPassword());
+        assertEquals(clienteNew.getTelefono(), resultado.getTelefono());
+
+        assertNull(resultado.getSNombre());
+        assertNull(resultado.getAMaterno());
+        assertNotNull(resultado.getDirecciones());
 
         // Los valores rellenados automaticamante son los esperados?
         assertEquals(1L, resultado.getId());
@@ -79,6 +93,7 @@ public class ClienteServiceTest {
         assertEquals("activo", resultado.getEstado());
 
         // Cuantas veces se llamo a .save()?
+        verify(usuarioRepo, times(1)).existsByCorreo("a.b@duoc.cl");
         verify(usuarioRepo, times(1)).save(clienteNew);
     }
 
@@ -88,10 +103,8 @@ public class ClienteServiceTest {
     void testSignInClienteDuplicado() {
         // Preparación de Objetos
         Cliente clienteNew = new Cliente(null, "12.123.123-4", "Amaru", null, "Burdiles", null, "a.b@duoc.cl", "testeando", "9 1234 1234", null, 0, null);
-        Cliente clienteSaved = new Cliente(1L, "12.123.123-4", "Amaru", null, "Burdiles", null, "a.b@duoc.cl", "testeando", "9 1234 1234", "activo", 1, null);
 
         // Definición lógica Mockito
-        when(usuarioRepo.save(clienteNew)).thenReturn(clienteSaved);
         when(usuarioRepo.existsByCorreo("a.b@duoc.cl")).thenReturn(true);
 
         // Ejecución servicio real
@@ -308,7 +321,7 @@ public class ClienteServiceTest {
         assertNull(resultado.getPassword());
 
         assertEquals(c1.getPNombre(), resultado.getNombre());
-        assertEquals(c1.getPApellido(), resultado.getApellido());
+        assertEquals(c1.getAPaterno(), resultado.getApellido());
         assertEquals(c1.getEstado(), resultado.getEstato());
         assertEquals("1", resultado.getNvlPermiso());
 
@@ -356,7 +369,7 @@ public class ClienteServiceTest {
         assertNull(resultado.getPassword());
 
         assertEquals(c1.getPNombre(), resultado.getNombre());
-        assertEquals(c1.getPApellido(), resultado.getApellido());
+        assertEquals(c1.getAPaterno(), resultado.getApellido());
         assertEquals(c1.getEstado(), resultado.getEstato());
         assertEquals("1", resultado.getNvlPermiso());
 
@@ -443,7 +456,6 @@ public class ClienteServiceTest {
     void testAddDireccionConEtiqueta() {
         // Preparación
         Direccion entrada = new Direccion(null, "Casa", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
-        Direccion guardada = new Direccion(1L, "Casa", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
 
         Cliente c1 = new Cliente(7L, "12.123.123-4", "Amaru", null, "Burdiles", null, "a.b@duoc.cl", "testeando", "9 1234 1234", "activo", 1, null);
         
@@ -452,7 +464,11 @@ public class ClienteServiceTest {
         // Configuración
         when(sesionServicio.validacionCliente(idCli)).thenReturn(true);
         when(clienteRepo.findById(idCli)).thenReturn(Optional.of(c1));
-        when(direccionRepo.save(entrada)).thenReturn(guardada);
+        when(direccionRepo.save(entrada)).thenAnswer(saveArg -> {
+            Direccion saving = saveArg.getArgument(0, Direccion.class);
+            saving.setId(1L);
+            return saving;
+        });
         when(clienteRepo.save(c1)).thenReturn(c1);
 
         // Testeo
@@ -461,9 +477,19 @@ public class ClienteServiceTest {
         // Validación
         assertNotNull(resultado);
         assertNotNull(resultado.getId());
-        assertEquals(guardada, resultado);
-
+        
+        // Argumentos que el servicio deberia modificar
+        assertEquals(1L, resultado.getId());
         assertEquals(entrada.getEtiqueta(), resultado.getEtiqueta());
+
+        // Argumentos que deberian quedar igual
+        assertEquals(entrada.getCalle(), resultado.getCalle());
+        assertEquals(entrada.getNCalle(), resultado.getNCalle());
+        assertEquals(entrada.getNCasaDpto(), resultado.getNCasaDpto());
+        assertEquals(entrada.getComuna(), resultado.getComuna());
+        assertEquals(entrada.getRegion(), resultado.getRegion());
+
+        assertNull(resultado.getDetalle());
 
         // Verificación
         verify(sesionServicio, times(1)).validacionCliente(idCli);
@@ -478,7 +504,6 @@ public class ClienteServiceTest {
     void testAddDireccionEtiquetaNull() {
         // Preparación
         Direccion entrada = new Direccion(null, null, "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
-        Direccion guardada = new Direccion(1L, "Dirección #1", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
 
         Cliente c1 = new Cliente(7L, "12.123.123-4", "Amaru", null, "Burdiles", null, "a.b@duoc.cl", "testeando", "9 1234 1234", "activo", 1, null);
         
@@ -487,7 +512,11 @@ public class ClienteServiceTest {
         // Configuración
         when(sesionServicio.validacionCliente(idCli)).thenReturn(true);
         when(clienteRepo.findById(idCli)).thenReturn(Optional.of(c1));
-        when(direccionRepo.save(entrada)).thenReturn(guardada);
+        when(direccionRepo.save(entrada)).thenAnswer(saveArgs -> {
+            Direccion saving = saveArgs.getArgument(0, Direccion.class);
+            saving.setId(1L);
+            return saving;
+        });
         when(clienteRepo.save(c1)).thenReturn(c1);
 
         // Testeo
@@ -496,9 +525,17 @@ public class ClienteServiceTest {
         // Validación
         assertNotNull(resultado);
         assertNotNull(resultado.getId());
-        assertEquals(guardada, resultado);
 
+        // Argumentos que el servicio deberia modificar
+        assertEquals(1L, resultado.getId());
         assertEquals("Dirección #1", resultado.getEtiqueta());
+
+        // Argumentos que deberian quedar igual
+        assertEquals(entrada.getCalle(), resultado.getCalle());
+        assertEquals(entrada.getNCalle(), resultado.getNCalle());
+        assertEquals(entrada.getNCasaDpto(), resultado.getNCasaDpto());
+        assertEquals(entrada.getComuna(), resultado.getComuna());
+        assertEquals(entrada.getRegion(), resultado.getRegion());
 
         // Verificación
         verify(sesionServicio, times(1)).validacionCliente(idCli);
@@ -513,7 +550,6 @@ public class ClienteServiceTest {
     void testAddDireccionEtiquetaBlank() {
         // Preparación
         Direccion entrada = new Direccion(null, "           ", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
-        Direccion guardada = new Direccion(1L, "Dirección #1", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
 
         Cliente c1 = new Cliente(7L, "12.123.123-4", "Amaru", null, "Burdiles", null, "a.b@duoc.cl", "testeando", "9 1234 1234", "activo", 1, null);
         
@@ -522,7 +558,11 @@ public class ClienteServiceTest {
         // Configuración
         when(sesionServicio.validacionCliente(idCli)).thenReturn(true);
         when(clienteRepo.findById(idCli)).thenReturn(Optional.of(c1));
-        when(direccionRepo.save(entrada)).thenReturn(guardada);
+        when(direccionRepo.save(entrada)).thenAnswer(saveArgs -> {
+            Direccion saving = saveArgs.getArgument(0, Direccion.class);
+            saving.setId(1L);
+            return saving;
+        });
         when(clienteRepo.save(c1)).thenReturn(c1);
 
         // Testeo
@@ -531,9 +571,17 @@ public class ClienteServiceTest {
         // Validación
         assertNotNull(resultado);
         assertNotNull(resultado.getId());
-        assertEquals(guardada, resultado);
 
+        // Argumentos que el servicio deberia modificar
+        assertEquals(1L, resultado.getId());
         assertEquals("Dirección #1", resultado.getEtiqueta());
+
+        // Argumentos que deberian quedar igual
+        assertEquals(entrada.getCalle(), resultado.getCalle());
+        assertEquals(entrada.getNCalle(), resultado.getNCalle());
+        assertEquals(entrada.getNCasaDpto(), resultado.getNCasaDpto());
+        assertEquals(entrada.getComuna(), resultado.getComuna());
+        assertEquals(entrada.getRegion(), resultado.getRegion());
 
         // Verificación
         verify(sesionServicio, times(1)).validacionCliente(idCli);
@@ -543,7 +591,7 @@ public class ClienteServiceTest {
     }
 
 
-    // TEST AÑADIR DIRECCIÓN DE ENVÍO (EXITOSO: ETIQUETA PRESENTE)
+    // TEST AÑADIR DIRECCIÓN DE ENVÍO (FALLIDA: AUTENTICACIÓN)
     @Test
     void testAddDireccionError() {
         // Preparación
@@ -554,9 +602,6 @@ public class ClienteServiceTest {
 
         // Configuración
         when(sesionServicio.validacionCliente(idCli)).thenThrow(HttpClientErrorException.class);
-        when(clienteRepo.findById(idCli)).thenReturn(Optional.of(c1));
-        when(direccionRepo.save(entrada)).thenReturn(entrada);
-        when(clienteRepo.save(c1)).thenReturn(c1);
 
         // Testeo y Validación
         assertThrows(HttpClientErrorException.class, () -> {
@@ -616,11 +661,9 @@ public class ClienteServiceTest {
     void testGetDireccionesError() {
         // Preparación
         Long id = 7L;
-        Cliente c7 = new Cliente();
 
         // Configuración
         when(sesionServicio.validacionCliente(id)).thenThrow(HttpClientErrorException.class);
-        when(clienteRepo.findById(id)).thenReturn(Optional.of(c7));
 
         // Testeo y Validación
         assertThrows(HttpClientErrorException.class, () -> {
@@ -689,7 +732,6 @@ public class ClienteServiceTest {
 
         // Configuración
         when(sesionServicio.validacionCliente(cliente)).thenThrow(HttpClientErrorException.class);
-        when(direccionRepo.findById(direccion)).thenReturn(Optional.empty());
 
         // Testeo y Validación
         assertThrows(HttpClientErrorException.class, () -> {
@@ -702,24 +744,21 @@ public class ClienteServiceTest {
     }
 
 
-    /* TODO: direccionRepo.findById(id) retorna un valor distinto
-       dependiendo en que parte del codigo estes. Como hacer que
-       when(...).then(...) haga cambios en el codigo en lugar de
-       solo retornar un valor
-    */
     // TEST ACTUALIZAR DIRECCIÓN (EXITOSO)
     @Test
     void testUpdateDireccion() {
         // Preparación
         UpdateDirDTO entrada = new UpdateDirDTO();
         entrada.setEtiqueta("Depa");
+        entrada.setNumCalle(-1);
+        entrada.setDetalle("Condo Valle del Sol, block 5");
 
         Direccion guardada = new Direccion(1L, "Dirección #1", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
         Direccion d2 = new Direccion();
         Direccion d3 = new Direccion();
         Direccion d4 = new Direccion();
 
-        Direccion actualizada = new Direccion(1L, "Depa", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
+        Direccion actualizada = new Direccion(1L, "Depa", "San Martin", 0, 67, "Condo Valle del Sol, block 5", Comuna.CONCEPCION, Region.BIOBIO);
 
         Cliente cli = new Cliente();
         cli.getDirecciones().add(guardada);
@@ -735,8 +774,7 @@ public class ClienteServiceTest {
         when(sesionServicio.validacionCliente(cliente)).thenReturn(true);
         when(direccionRepo.findById(direccion)).thenReturn(Optional.of(guardada));
         when(clienteRepo.findById(cliente)).thenReturn(Optional.of(cli));
-
-        //when(clienteRepo.save(cli)).thenReturn(null)(guardada = actualizada);
+        when(clienteRepo.save(cli)).thenReturn(cli);
 
         // Testeo
         Direccion resultado = clienteServicio.updateDireccion(cliente, entrada, direccion);
@@ -745,8 +783,120 @@ public class ClienteServiceTest {
         assertNotNull(resultado);
         assertEquals(actualizada, resultado);
 
+        // Verificación
+        verify(sesionServicio, times(1)).validacionCliente(cliente);
+        verify(direccionRepo, times(1)).findById(direccion);
+        verify(clienteRepo, times(1)).findById(cliente);
+        verify(clienteRepo, times(1)).save(cli);
     }
 
+
+    // TEST ACTUALIZAR DIRECCIÓN (FALLIDO: DIRECCION NO ENCONTRADA)
+    @Test
+    void testUpdateDireccionNotFound() {
+        // Preparación
+        UpdateDirDTO entrada = new UpdateDirDTO();
+        entrada.setEtiqueta("Depa");
+
+        Long cliente = 7L;
+        Long direccion = 1L;
+
+        // Configuración
+        when(sesionServicio.validacionCliente(cliente)).thenReturn(true);
+        when(direccionRepo.findById(direccion)).thenReturn(Optional.empty());
+
+        // Testeo
+        Direccion resultado = clienteServicio.updateDireccion(cliente, entrada, direccion);
+
+        // Validación
+        assertNull(resultado);
+
+        // Verificación
+        verify(sesionServicio, times(1)).validacionCliente(cliente);
+        verify(direccionRepo, times(1)).findById(direccion);
+        verify(clienteRepo, times(0)).findById(cliente);
+        verify(clienteRepo, times(0)).save(any(Cliente.class));
+    }
+
+
+    // TEST ACTUALIZAR DIRECCIÓN (FALLIDO: SIN CAMBIOS, ATRIBUTOS DE ENTRADA SON NULL)
+    @Test
+    void testUpdateDireccionSinCambiosA() {
+        // Preparación
+        UpdateDirDTO entrada = new UpdateDirDTO();
+
+        Direccion guardada = new Direccion(1L, "Dirección #1", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
+        Direccion d2 = new Direccion();
+        Direccion d3 = new Direccion();
+        Direccion d4 = new Direccion();
+
+        Cliente cli = new Cliente();
+        cli.getDirecciones().add(guardada);
+        cli.getDirecciones().add(d2);
+        cli.getDirecciones().add(d3);
+        cli.getDirecciones().add(d4);
+
+        Long cliente = 7L;
+        Long direccion = 1L;
+
+
+        // Configuración
+        when(sesionServicio.validacionCliente(cliente)).thenReturn(true);
+        when(direccionRepo.findById(direccion)).thenReturn(Optional.of(guardada));
+        when(clienteRepo.findById(cliente)).thenReturn(Optional.of(cli));
+        when(clienteRepo.save(cli)).thenReturn(cli);
+
+        // Testeo y Validacion
+        assertThrows(SinCambiosException.class, () -> {
+            clienteServicio.updateDireccion(cliente, entrada, direccion);
+        });
+
+        // Verificación
+        verify(sesionServicio, times(1)).validacionCliente(cliente);
+        verify(direccionRepo, times(1)).findById(direccion);
+        verify(clienteRepo, times(0)).findById(cliente);
+        verify(clienteRepo, times(0)).save(cli);
+    }
+
+
+    // TEST ACTUALIZAR DIRECCIÓN (FALLIDO: SIN CAMBIOS, ENTRADA == GUARDADA)
+    @Test
+    void testUpdateDireccionSinCambiosbB() {
+        // Preparación
+        UpdateDirDTO entrada = new UpdateDirDTO("Dirección #1", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
+
+        Direccion guardada = new Direccion(1L, "Dirección #1", "San Martin", 5, 67, null, Comuna.CONCEPCION, Region.BIOBIO);
+        Direccion d2 = new Direccion();
+        Direccion d3 = new Direccion();
+        Direccion d4 = new Direccion();
+
+        Cliente cli = new Cliente();
+        cli.getDirecciones().add(guardada);
+        cli.getDirecciones().add(d2);
+        cli.getDirecciones().add(d3);
+        cli.getDirecciones().add(d4);
+
+        Long cliente = 7L;
+        Long direccion = 1L;
+
+
+        // Configuración
+        when(sesionServicio.validacionCliente(cliente)).thenReturn(true);
+        when(direccionRepo.findById(direccion)).thenReturn(Optional.of(guardada));
+        when(clienteRepo.findById(cliente)).thenReturn(Optional.of(cli));
+        when(clienteRepo.save(cli)).thenReturn(cli);
+
+        // Testeo y Validacion
+        assertThrows(SinCambiosException.class, () -> {
+            clienteServicio.updateDireccion(cliente, entrada, direccion);
+        });
+
+        // Verificación
+        verify(sesionServicio, times(1)).validacionCliente(cliente);
+        verify(direccionRepo, times(1)).findById(direccion);
+        verify(clienteRepo, times(0)).findById(cliente);
+        verify(clienteRepo, times(0)).save(cli);
+    }
 
     // TEST QUITAR DIRECCIÓN DE ENVÍO (EXITOSO)
     @Test

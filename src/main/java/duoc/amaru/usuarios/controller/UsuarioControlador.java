@@ -41,15 +41,9 @@ public class UsuarioControlador {
     private EmpleadoServicio empleadoServicio;
 
 
-    // OBTENER USUARIOS (TESTING)
-    @GetMapping
-    public ResponseEntity<?> getUsuarios() {
-        List<Usuario> users = usuarioServicio.readAllUsers();
-
-        if (users.isEmpty())
-            return ResponseEntity.ok("No hay usuarios registrados");
-        return ResponseEntity.ok(users);
-    }
+    // TODO: Implementar listar usuarios registrados
+    // TODO: Implementar listar cliente registrados
+    // TODO: Implementar listar empleados registrados
 
     // REGISTRAR CLIENTE
     @PostMapping("/signin")
@@ -105,7 +99,7 @@ public class UsuarioControlador {
         if (reply == null)
             return ResponseEntity.status(400).body("Nuevo nivel de acceso fuera de rango");
 
-        return ResponseEntity.ok("Permisos actualizados para usuario "+ reply.getPNombre() +" "+ reply.getPApellido());
+        return ResponseEntity.ok("Permisos actualizados para usuario "+ reply.getPNombre() +" "+ reply.getAPaterno());
     }
 
     // ACTUALIZAR CARGO DE EMPLEADO
@@ -116,7 +110,7 @@ public class UsuarioControlador {
         if (reply == null)
             return ResponseEntity.status(400).body("Cargo inválido");
 
-        return ResponseEntity.ok("Cargo actualizado para empleado "+ reply.getPNombre() +" "+ reply.getPApellido());
+        return ResponseEntity.ok("Cargo actualizado para empleado "+ reply.getPNombre() +" "+ reply.getAPaterno());
     }
 
     // AGREGAR DIRECCION DE ENVIO A CLIENTE
@@ -173,7 +167,7 @@ public class UsuarioControlador {
     @PutMapping("/user{userId}:desactivar/{executorId}")
     public ResponseEntity<?> putDesactivarUser(@PathVariable Long userId, @PathVariable Long executorId) {
         Usuario reply = empleadoServicio.desactivarUser(userId, executorId);
-        return ResponseEntity.ok("La cuenta de "+ reply.getPNombre() +" "+ reply.getPApellido() +" ha sido desactivada"); 
+        return ResponseEntity.ok("La cuenta de "+ reply.getPNombre() +" "+ reply.getAPaterno() +" ha sido desactivada"); 
     }
 
     // ELIMINAR USUARIO

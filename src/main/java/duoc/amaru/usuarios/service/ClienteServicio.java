@@ -46,6 +46,7 @@ public class ClienteServicio {
     }
 
 
+    // TODO: Implementar en controlador y en servicio empleados
     // OBTENER CLIENTES REGISTRADOS
     public List<GetClientesDTO> getAllClientes(Long idEjecutor) {
         // Id = 0 representa operaciones y peticiones del sistema mismo
@@ -58,7 +59,7 @@ public class ClienteServicio {
         // Full list
         List<Cliente> fullCli = clienteRepo.findAll();
         for (Cliente cli : fullCli) {
-            String nombApel = cli.getPNombre() +' '+ cli.getPApellido();
+            String nombApel = cli.getPNombre() +' '+ cli.getAPaterno();
             summCli.add(new GetClientesDTO(cli.getId(), nombApel, cli.getCorreo(), cli.getEstado(), cli.getNvlPermiso()));
         }
 
@@ -66,6 +67,7 @@ public class ClienteServicio {
     }
 
 
+    // TODO: Implementar una version similar en servicio Empleado
     // OBTENER CLIENTE POR ID
     public GetClienteDTO getClienteById(Long idEjecutor, Long idBuscar) {
         if (idEjecutor > 0) {
@@ -94,7 +96,7 @@ public class ClienteServicio {
             // Concatena los nombres
             String fullName = full.getPNombre() + (full.getSNombre() == null ? ' ' : ' '+full.getSNombre() +' ');
             // A eso le concatena los apellidos
-            fullName += full.getPApellido() + (full.getSApellido() == null ? "" : ' '+full.getSApellido());
+            fullName += full.getAPaterno() + (full.getAMaterno() == null ? "" : ' '+full.getAMaterno());
             dto.setNombreCompleto(fullName);
 
             return dto;
@@ -106,7 +108,7 @@ public class ClienteServicio {
 
         // Rellena con info útil para administradores
         dto.setNombre(full.getPNombre());
-        dto.setApellido(full.getPApellido());
+        dto.setApellido(full.getAPaterno());
         dto.setEstato(full.getEstado());
         dto.setNvlPermiso(String.valueOf(full.getNvlPermiso()));
 
@@ -179,6 +181,33 @@ public class ClienteServicio {
             return null;
         }
 
+        /* null o 0 = representa que se quiere mantener el valor guardado
+        blank o -1 = representa que se quiere eliminar el valor guardado
+        any = representa que se reemplaza el valor guardado con el nuevo */
+        if (nueva.getEtiqueta() == null)
+            nueva.setEtiqueta(former.getEtiqueta());
+
+        if (nueva.getCalle() == null)
+            nueva.setCalle(former.getCalle());
+
+        if (nueva.getNumCalle() == 0)
+            nueva.setNumCalle(former.getNCalle());
+        else
+            if (nueva.getNumCalle() == -1)
+                nueva.setNumCalle(0);
+
+        if (nueva.getNumCasaDpto() == 0)
+            nueva.setNumCasaDpto(former.getNCasaDpto());
+
+        if (nueva.getDetalle() == null)
+            nueva.setDetalle(former.getDetalle());
+
+        if (nueva.getComuna() == null)
+            nueva.setComuna(former.getComuna());
+
+        if (nueva.getRegion() == null)
+            nueva.setRegion(former.getRegion());
+
         // Transformar dirección actual a resumen (dto)
         UpdateDirDTO formerDTO = new UpdateDirDTO();
         formerDTO.setEtiqueta(former.getEtiqueta());
@@ -196,34 +225,20 @@ public class ClienteServicio {
         // Obtener cliente al que pertenece la direccion
         Cliente cli = clienteRepo.findById(userId).get();
         
+        // Aplicar cambios
+        former.setEtiqueta(nueva.getEtiqueta());
+        former.setCalle(nueva.getCalle());
+        former.setNCasaDpto(nueva.getNumCasaDpto());
+        former.setComuna(nueva.getComuna());
+        former.setRegion(nueva.getRegion());
+        former.setDetalle(nueva.getDetalle());
+        former.setNCalle(nueva.getNumCalle());
+        
         // Encontrar la posicion de la direccion en la lista
         int i = cli.getDirecciones().indexOf(former);
         
-        // Aplicar cambios a former
-        if (nueva.getEtiqueta() != null)
-            former.setEtiqueta(nueva.getEtiqueta());
-
-        if (nueva.getCalle() != null)
-            former.setCalle(nueva.getCalle());
-
-        if (nueva.getNumCasaDpto() != 0)
-            former.setNCasaDpto(nueva.getNumCasaDpto());
-        
-        if (nueva.getComuna() != null)
-            former.setComuna(nueva.getComuna());
-        
-        if (nueva.getRegion() != null)
-            former.setRegion(nueva.getRegion());
-        
-        former.setNCalle(nueva.getNumCalle());
-        former.setDetalle(nueva.getDetalle());
-        
-        // Reemplazar en la lista
-        cli.getDirecciones().set(i, former);
-        
         // Guardar cambios y respuesta al controlador
-        clienteRepo.save(cli);
-        return direccionRepo.findById(dirId).get();
+        return clienteRepo.save(cli).getDirecciones().get(i);
     }
 
     // QUITAR DIRECCION DE ENVIO DE UN CLIENTE

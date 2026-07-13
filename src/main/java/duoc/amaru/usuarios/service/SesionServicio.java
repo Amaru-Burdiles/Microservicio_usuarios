@@ -37,6 +37,10 @@ public class SesionServicio {
 
     // INICIAR SESION
     public boolean logIn(Long id) {
+        String estado = usuarioRepo.findById(id).get().getEstado();
+
+        if (estado == "desactivado")
+            return false;
         return sesiones.add(id);
     }
 
@@ -97,5 +101,3 @@ public class SesionServicio {
         return true;
     }
 }
-
-// Validar si el usuario esta desactivado
