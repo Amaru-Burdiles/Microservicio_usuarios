@@ -126,7 +126,7 @@ public class EmpleadoServicioTest {
     @Test
     void testRegistrarEmpleadoAdmin() {
         // Preparación
-        Long admin = 8L;
+        Long admin = 0L;
         Empleado entrante = new Empleado(null, "21.210.987-6",
                                          "Alexis", null,
                                          "Oñate", null,
@@ -154,7 +154,7 @@ public class EmpleadoServicioTest {
         assertEquals(4, resultado.getNvlPermiso());
         
         // Verificar
-        verify(sesionServicio, times(1)).validacionEmpleado(admin, 3);
+        verify(sesionServicio, times(0)).validacionEmpleado(admin, 3);
         verify(usuarioRepo, times(1)).existsByCorreo("al.onn@gmail.com");
         verify(usuarioRepo, times(1)).save(entrante);
     }

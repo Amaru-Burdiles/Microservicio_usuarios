@@ -219,7 +219,7 @@ public class UsuarioControladorTest {
     }
 
     @Test
-    void getDireccionesEnvio_ConDatos() {
+    void getDireccionesEnvio_ConUnDato() {
         GetDireccionDTO dirDto = new GetDireccionDTO();
         List<GetDireccionDTO> lista = List.of(dirDto);
 
@@ -229,6 +229,20 @@ public class UsuarioControladorTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals("1 dirección de envío guardada:\n" + lista.toString(), response.getBody());
+    }
+
+    @Test
+    void getDireccionesEnvio_ConDatos() {
+        GetDireccionDTO dirDto = new GetDireccionDTO();
+        GetDireccionDTO dirDto2 = new GetDireccionDTO();
+        List<GetDireccionDTO> lista = List.of(dirDto, dirDto2);
+
+        when(clienteServicio.getDirecciones(1L)).thenReturn(lista);
+
+        ResponseEntity<?> response = usuarioControlador.getDireccionesEnvio(1L);
+
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals("2 direcciones de envío guardadas:\n" + lista.toString(), response.getBody());
     }
 
     @Test

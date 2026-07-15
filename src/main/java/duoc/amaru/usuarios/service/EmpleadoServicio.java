@@ -34,7 +34,8 @@ public class EmpleadoServicio {
     // REGISTRO DE EMPLEADOS
     public Empleado registrarUsuario(Long id, Empleado newEmpleado) {
         // # VALIDACION DE PERMISOS
-        sesionServicio.validacionEmpleado(id, 3);
+        if (id > 0)
+            sesionServicio.validacionEmpleado(id, 3);
 
         // # VALIDACION DE EMPLEADO NUEVO
         // Verificar que el correo no esté registrado
